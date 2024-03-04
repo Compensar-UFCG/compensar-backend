@@ -1,0 +1,21 @@
+# Arquivos gerados pelo TypeScript
+/dist/
+
+# Dependências instaladas pelo npm
+/node_modules/
+
+# Arquivo de log
+npm-debug.log
+
+# Arquivos de compilação do VS Code
+.vscode/
+
+# Arquivos de ambiente locais
+.env
+
+# Arquivos de cache do TypeScript
+*.tsbuildinfo
+
+# Arquivos de configuração do sistema
+.DS_Store
+Thumbs.db
