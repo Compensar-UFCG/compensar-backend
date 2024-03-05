@@ -1,8 +1,6 @@
 import { Schema, model, Document } from 'mongoose';
 
 import { UUID } from "crypto";
-import { title } from 'process';
-
 interface Competence extends Document{
   id: UUID
   title: `${string & {length: 100}}`;
