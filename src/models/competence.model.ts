@@ -3,8 +3,8 @@ import { Schema, model, Document } from 'mongoose';
 import { UUID } from "crypto";
 interface Competence extends Document{
   id: UUID
-  title: `${string & {length: 100}}`;
-  description: `${string & {length: 255}}`;
+  title: string;
+  description: string;
 }
 
 const competenceSchema = new Schema<Competence>({
