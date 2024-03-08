@@ -6,21 +6,32 @@ const MIN_LENGTH=3;
 const MAX_LENGTH_TITLE=100;
 const MAX_LENGTH_DESCRIPTION=255;
 
+interface CompetenceErrorMessages {
+  titleEmpty: string,
+  titleLength: string,
+  descriptionEmpty: string,
+  descriptionLength: string,
+}
+export const competenceErrorMessages: CompetenceErrorMessages = {
+  titleEmpty: 'Title isn`t empty',
+  titleLength: `Title need minimum ${MIN_LENGTH} characters and maximum ${MAX_LENGTH_TITLE} characters`,
+  descriptionEmpty: 'Description isn`t empty',
+  descriptionLength: `Description need minimum ${MIN_LENGTH} characters and maximum ${MAX_LENGTH_DESCRIPTION} characters`
+}
+
 export const competenceValidationSchema = checkSchema({
   title: {
-    notEmpty: { errorMessage: 'Title isn`t empty' },
-    isString: { errorMessage: 'Title is a text'},
+    notEmpty: { errorMessage: competenceErrorMessages.titleEmpty },
     isLength: {
       options: { min: MIN_LENGTH, max: MAX_LENGTH_TITLE },
-      errorMessage: `Title need minimum ${MIN_LENGTH} characters and maximum ${MAX_LENGTH_TITLE} characters`
+      errorMessage: competenceErrorMessages.titleLength
     },
   },
   description: {
-    notEmpty: { errorMessage: 'Description isn`t empty' },
-    isString: { errorMessage: 'Description is a text'},
+    notEmpty: { errorMessage: competenceErrorMessages.descriptionEmpty },
     isLength: {
       options: { min: MIN_LENGTH, max: MAX_LENGTH_DESCRIPTION },
-      errorMessage: `Description need minimum ${MIN_LENGTH} characters and maximum ${MAX_LENGTH_DESCRIPTION} characters`
+      errorMessage: competenceErrorMessages.descriptionLength
     }
   },
 }, ['body']);

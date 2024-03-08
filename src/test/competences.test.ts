@@ -4,6 +4,7 @@ import competencesMock from "./mocks/competencesMock.json";
 import express from 'express';
 import CompetenceModel from '../models/competence.model';
 import bodyParser from 'body-parser';
+import { competenceErrorMessages } from '../utils/competences.validation';
 
 const app = express();
 
@@ -98,4 +99,118 @@ describe('Competence Routes - API requests success and erros', () => {
 });
 
 describe('Competence Routes - sanitization and validation body errors', () => {
+  beforeEach(() => {
+    CompetenceModel.findByIdAndUpdate = jest.fn().mockReturnValueOnce(competencesMock[0]);
+  });
+  describe('PUT /competences/:id', () => {
+    describe('Title Competence', () => {
+      it('return error when try edit a competence with no add title', async () => {
+        const payload = { description: "Valid Description" };
+        const response = await request(app).put('/competences/123').send(payload);
+
+        expect(response.status).toBe(422);
+        expect(response.body.message).toMatch(competenceErrorMessages.titleEmpty);
+      });
+
+      it('return error when try edit a competence with a title empty', async () => {
+        const payload = { title: "", description: "Valid Description" };
+        const response = await request(app).put('/competences/123').send(payload);
+
+        expect(response.status).toBe(422);
+        expect(response.body.message).toMatch(competenceErrorMessages.titleEmpty);
+      });
+
+      it('return error when try edit a competence with a title empty', async () => {
+        const payload = { title: "   ", description: "Valid Description" };
+        const response = await request(app).put('/competences/123').send(payload);
+
+        expect(response.status).toBe(422);
+        expect(response.body.message).toMatch(competenceErrorMessages.titleEmpty);
+      });
+
+      it('return error when try edit a competence title with no length min', async () => {
+        const payload = { title: "12", description: "Valid Description" };
+        const response = await request(app).put('/competences/123').send(payload);
+
+        expect(response.status).toBe(422);
+        expect(response.body.message).toMatch(competenceErrorMessages.titleLength);
+      });
+
+      it('return error when try edit a competence title with length more then max', async () => {
+        const payload = { title: "I add a new title with more them 100 characters in my unit test to check if returns error when i try!", description: "Valid Description" };
+        const response = await request(app).put('/competences/123').send(payload);
+
+        expect(response.status).toBe(422);
+        expect(response.body.message).toMatch(competenceErrorMessages.titleLength);
+      });
+
+      it('return success when try edit a competence title with length min', async () => {
+        const payload = { title: "123", description: "Valid Description" };
+        const response = await request(app).put('/competences/123').send(payload);
+
+        expect(response.status).toBe(200);
+      });
+      it('return success when try edit a competence title with length max', async () => {
+        const payload = { title: "I add a new title with more them 100 characters in my unit test to check if returns error when i try", description: "Valid Description" };
+        const response = await request(app).put('/competences/123').send(payload);
+
+        expect(response.status).toBe(200);
+      });
+    });
+
+    describe('Description Competence', () => {
+      it('return error when try edit a competence with no add description', async () => {
+        const payload = { title: "Valid title" };
+        const response = await request(app).put('/competences/123').send(payload);
+
+        expect(response.status).toBe(422);
+        expect(response.body.message).toMatch(competenceErrorMessages.descriptionEmpty);
+      });
+
+      it('return error when try edit a competence with a description empty', async () => {
+        const payload = { title: "Valid title", description: "" };
+        const response = await request(app).put('/competences/123').send(payload);
+
+        expect(response.status).toBe(422);
+        expect(response.body.message).toMatch(competenceErrorMessages.descriptionEmpty);
+      });
+
+      it('return error when try edit a competence with a description empty', async () => {
+        const payload = { title: "Valid title", description: "   " };
+        const response = await request(app).put('/competences/123').send(payload);
+
+        expect(response.status).toBe(422);
+        expect(response.body.message).toMatch(competenceErrorMessages.descriptionEmpty);
+      });
+
+      it('return error when try edit a competence description with no length min', async () => {
+        const payload = { title: "Valid title", description: "12" };
+        const response = await request(app).put('/competences/123').send(payload);
+
+        expect(response.status).toBe(422);
+        expect(response.body.message).toMatch(competenceErrorMessages.descriptionLength);
+      });
+
+      it('return error when try edit a competence description with length more then max', async () => {
+        const payload = { title: "Valid title", description: "I add a new description with more them 255 characters in my unit test to check if returns error when i try do this! So I add another characters to see if returns an error or not. So, to this I need add to mutch characters in my text. Because, I need know!!" };
+        const response = await request(app).put('/competences/123').send(payload);
+
+        expect(response.status).toBe(422);
+        expect(response.body.message).toMatch(competenceErrorMessages.descriptionLength);
+      });
+
+      it('return success when try edit a competence description with length min', async () => {
+        const payload = { title: "Valid title", description: "123" };
+        const response = await request(app).put('/competences/123').send(payload);
+
+        expect(response.status).toBe(200);
+      });
+      it('return success when try edit a competence description with length max', async () => {
+        const payload = { title: "Valid title", description: "I add a new description with more them 255 characters in my unit test to check if returns error when i try do this! So I add another characters to see if returns an error or not. So, to this I need add to mutch characters in my text. Because, I need know!"};
+        const response = await request(app).put('/competences/123').send(payload);
+
+        expect(response.status).toBe(200);
+      });
+    });
+  });
 });
