@@ -1,5 +1,6 @@
 import { Router, Request, Response } from 'express';
 import Competence from '../models/competence.model';
+import { checkIsValidCompetenceBody, competenceValidationSchema, sanitizationCompetenceBody,  } from '../utils/competences.validation';
 
 const router: Router = Router();
 
@@ -26,7 +27,11 @@ router.get('/competences/:id', async (req: Request, res: Response) => {
   }
 });
 
-router.post('/competences', async (req: Request, res: Response) => {
+router.post('/competences', sanitizationCompetenceBody, competenceValidationSchema, async (req: Request, res: Response) => {
+  const { isError, message } = checkIsValidCompetenceBody(req);
+
+  if(isError) return res.status(422).json({ message })
+
   const competence = new Competence({
     title: req.body.title,
     description: req.body.description,
@@ -36,19 +41,29 @@ router.post('/competences', async (req: Request, res: Response) => {
     const newCompetence = await competence.save();
     res.status(201).json(newCompetence);
   } catch (err) {
-    res.status(400).json(err);
+    res.status(500).json(err);
   }
 });
 
-router.put('/competences/:id', async (req: Request, res: Response) => {
+router.put('/competences/:id', sanitizationCompetenceBody, competenceValidationSchema, async (req: Request, res: Response) => {
+  const { isError, message } = checkIsValidCompetenceBody(req);
+
+  if(isError) return res.status(422).json({ message })
+
   const id = req.params.id;
   const { title, description } = req.body;
 
   try {
     const competence = await Competence.findByIdAndUpdate(id, { title, description }, { new: true });
+    if (!competence) {
+      return res.status(404).json({ message: 'Competence not found' });
+    }
     res.json(competence);
   } catch (err) {
-    res.status(400).json(err);
+    res.status(500).json(err);
+  }
+});
+
 router.delete('/competences/:id', async (req: Request, res: Response) => {
   const id = req.params.id;
   try {
