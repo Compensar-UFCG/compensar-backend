@@ -49,6 +49,16 @@ router.put('/competences/:id', async (req: Request, res: Response) => {
     res.json(competence);
   } catch (err) {
     res.status(400).json(err);
+router.delete('/competences/:id', async (req: Request, res: Response) => {
+  const id = req.params.id;
+  try {
+    const competence = await Competence.findByIdAndDelete(id);
+    if (!competence) {
+      return res.status(404).json({ message: 'Competence not found' });
+    }
+    res.status(200).json({ message: `Delete competence '${competence.title}' with success`});
+  } catch (err) {
+    res.status(500).json(err);
   }
 });
 
