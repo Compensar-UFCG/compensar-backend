@@ -1,15 +1,17 @@
 import { Router, Request, Response } from 'express';
 import Competence from '../models/competence.model';
 import { checkIsValidCompetenceBody, competenceValidationSchema, sanitizationCompetenceBody,  } from '../utils/competences.validation';
+import { getErrorObject } from '../utils/error';
 
 const router: Router = Router();
 
 router.get('/competences', async (_: Request, res: Response) => {
   try {
     const competences = await Competence.find();
-    res.json(competences);
+    res.status(200).json(competences);
   } catch (err) {
-    res.status(500).json(err);
+    const error = getErrorObject(err);
+    res.status(error.status).json(error);
   }
 });
 
@@ -21,9 +23,10 @@ router.get('/competences/:id', async (req: Request, res: Response) => {
     if (!competence) {
       return res.status(404).json({ message: 'Competence not found' });
     }
-    res.json(competence);
+    res.status(200).json(competence);
   } catch (err) {
-    res.status(500).json(err);
+    const error = getErrorObject(err);
+    res.status(error.status).json(error);
   }
 });
 
@@ -41,7 +44,8 @@ router.post('/competences', sanitizationCompetenceBody, competenceValidationSche
     const newCompetence = await competence.save();
     res.status(201).json(newCompetence);
   } catch (err) {
-    res.status(500).json(err);
+    const error = getErrorObject(err);
+    res.status(error.status).json(error);
   }
 });
 
@@ -60,7 +64,8 @@ router.put('/competences/:id', sanitizationCompetenceBody, competenceValidationS
     }
     res.json(competence);
   } catch (err) {
-    res.status(500).json(err);
+    const error = getErrorObject(err);
+    res.status(error.status).json(error);
   }
 });
 
@@ -73,7 +78,8 @@ router.delete('/competences/:id', async (req: Request, res: Response) => {
     }
     res.status(200).json({ message: `Delete competence '${competence.title}' with success`});
   } catch (err) {
-    res.status(500).json(err);
+    const error = getErrorObject(err);
+    res.status(error.status).json(error);
   }
 });
 
