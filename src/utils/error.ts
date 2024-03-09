@@ -12,7 +12,7 @@ interface Error {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const getErrorObject = (err: any): Error => {
   return {
-    status: err?.status || err?.statusCode || 500,
-    message: err?.message || "Interner Server Error"
+    status: err.status || err.statusCode || 500,
+    message: err.message || "Interner Server Error"
   };
 }
