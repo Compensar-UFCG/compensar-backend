@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "npx ts-node src/server.ts",
-    "test": "jest",
+    "test": "jest --coverage",
     "lint": "eslint ."
   },
   "keywords": [],
