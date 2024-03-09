@@ -19,3 +19,6 @@ npm-debug.log
 # Arquivos de configuração do sistema
 .DS_Store
 Thumbs.db
+
+# Arquivos de cobertura de testes
+/coverage/
