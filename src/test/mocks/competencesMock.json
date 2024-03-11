@@ -1,0 +1,47 @@
+[
+  {
+      "_id": "65e716cd6b58df0b9764fd06",
+      "title": "Coleta de Dados",
+      "description": "Obter ou gerar dados através de observações empíricas ou de figuras, tabelas, listas, gráficos, etc. Os dados obtidos devem ser usados para auxiliar na resolução do problema proposto."
+  },
+  {
+      "_id": "65e717356b58df0b9764fd09",
+      "title": "Análise de Dados",
+      "description": "Interpretar informações a partir de dados fornecidos ou identificados. Essas informações devem ser usadas para dar sentido aos dados coletados e posteriormente suportar a resolução do problema proposto."
+  },
+  {
+      "_id": "65e71a446b58df0b9764fd0c",
+      "title": "Representação de Dados",
+      "description": "Gerar gráficos, tabelas, matrizes, conjuntos, diagramas, etc. Essas representações devem ser usadas para entender melhor os dados que estão sendo manipulados e facilitar a visualização dos mesmos."
+  },
+  {
+      "_id": "65e71a536b58df0b9764fd0e",
+      "title": "Decomposição de Problemas",
+      "description": "Resolver expressões aritméticas obedecendo ordem de precedências e outras características algébricas. Essas expressões devem ser usadas para fazer com que os alunos entendam como dividir um problema e identificar o que deve ser resolvido primeiro para chegar a uma proposta de resolução do problema."
+  },
+  {
+      "_id": "65e71a626b58df0b9764fd10",
+      "title": "Abstração",
+      "description": "Analisar um contexto real visando obter dados e expressões relevantes que irão auxiliar na resolução do problema proposto pela atividade. Esse procedimento é necessário para que o aluno realize assimilações do que aprendeu com problemas reais."
+  },
+  {
+      "_id": "65e71a716b58df0b9764fd12",
+      "title": "Algoritmos e Procedimentos",
+      "description": "Resolver o problema proposto na atividade utilizando uma sequência lógica de passos que não estejam explícitos. Trata-se da organização do procedimento de resolução por meio de um passo a passo, por exemplo."
+  },
+  {
+      "_id": "65e71a7e6b58df0b9764fd14",
+      "title": "Automação",
+      "description": "Usar ferramentas para auxiliar o processo de resolução do problema proposto na atividade como a calculadora, por exemplo."
+  },
+  {
+      "_id": "65e71a8c6b58df0b9764fd16",
+      "title": "Simulação",
+      "description": "Realizar modificações de valores de variáveis visando obter conclusões distintas ou identificar comportamentos diferentes para o problema proposto pela atividade."
+  },
+  {
+      "_id": "65e71a9b6b58df0b9764fd18",
+      "title": "Paralelismo",
+      "description": "Possibilitar que alguns procedimentos da resolução do problema proposto possam ser realizados simultaneamente ou em cooperação entre os envolvidos. É necessário dividir o problema em partes menores para que seja possível paralelizar."
+  }
+]
