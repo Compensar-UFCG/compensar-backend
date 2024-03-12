@@ -10,6 +10,5 @@
   "routes": [
     { "src": "/competences", "dest": "/competence.routes.ts" },
     { "src": "/(.*)", "dest": "/index.ts" }
-  ],
-  "root": "compensar-backend"
+  ]
 }
