@@ -4,8 +4,17 @@ import { checkIsValidCompetenceBody, competenceValidationSchema, sanitizationCom
 import { getErrorObject } from '../utils/error';
 
 const router: Router = Router();
-
 router.get('/', async (_: Request, res: Response) => {
+  try {
+    const competences = await Competence.find();
+    res.status(200).json(competences);
+  } catch (err) {
+    const error = getErrorObject(err);
+    res.status(error.status).json(error);
+  }
+});
+
+router.get('/competences', async (_: Request, res: Response) => {
   try {
     const competences = await Competence.find();
     res.status(200).json(competences);
