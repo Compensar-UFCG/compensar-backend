@@ -24,3 +24,5 @@ mongoose.connect(`mongodb+srv://${process.env.MONGO_DB_USER}:${process.env.MONGO
     
     console.error('Error connecting to MongoDB:', err.message)
   });
+
+export default app;
