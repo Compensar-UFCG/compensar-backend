@@ -7,9 +7,8 @@
     }
   ],
   "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "index.ts"
-    }
-  ]
+    { "src": "/competences", "dest": "./src/routes/competence.routes.js" },
+    { "src": "/(.*)", "dest": "./src/index.js" }
+  ],
+  "root": "compensar-backend"
 }
