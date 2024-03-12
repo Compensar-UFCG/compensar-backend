@@ -60,6 +60,9 @@ export const userValidationSchema = checkSchema({
 
 export const sanitizationUserBody =
   [
+    body('name')
+      .trim()
+      .escape(),
     body('username')
       .trim()
       .escape(),
