@@ -10,7 +10,7 @@ const app: Application = express();
 const PORT = process.env.PORT || 8080;
 
 app.use(bodyParser.json());
-app.use('/api', competenceRoutes);
+app.use(competenceRoutes);
 
 mongoose.connect(`mongodb+srv://${process.env.MONGO_DB_USER}:${process.env.MONGO_DB_PASSWORD}@cluster0.beoiebt.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`)
   .then(() => {

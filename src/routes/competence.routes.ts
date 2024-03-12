@@ -5,7 +5,7 @@ import { getErrorObject } from '../utils/error';
 
 const router: Router = Router();
 
-router.get('/competences', async (_: Request, res: Response) => {
+router.get('/', async (_: Request, res: Response) => {
   try {
     const competences = await Competence.find();
     res.status(200).json(competences);
