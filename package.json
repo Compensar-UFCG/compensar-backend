@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "npx ts-node src/server.ts",
+    "dev": "npx ts-node src/index.ts",
     "test": "jest --coverage",
     "lint": "eslint ."
   },
