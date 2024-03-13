@@ -14,6 +14,7 @@ app.use(router);
 
 jest.mock('../models/user.model');
 
+const payload = {...usersMock[0], password: "#Aa12345" }
 describe('User Routes - API requests success and erros', () => {
   beforeEach(() => {
     UserModel.find = jest.fn().mockReturnValueOnce(usersMock);
@@ -27,7 +28,7 @@ describe('User Routes - API requests success and erros', () => {
       const response = await request(app).get('/users');
 
       expect(response.status).toBe(200);
-      expect(response.body).toEqual(usersMock.map(user => { return { name: user.name, email: user.email }}));
+      expect(response.body).toEqual(usersMock);
     });
 
     it('responds with 500 status if an error occurs', async () => {
@@ -54,7 +55,7 @@ describe('User Routes - API requests success and erros', () => {
       const response = await request(app).get('/users/123');
 
       expect(response.status).toBe(200);
-      expect(response.body).toEqual({ name: usersMock[0].name, email: usersMock[0].email });
+      expect(response.body).toEqual(usersMock[0]);
     });
 
     it('responds with 404 status if user not found', async () => {
@@ -82,7 +83,6 @@ describe('User Routes - API requests success and erros', () => {
       const mockSaveUser = jest.spyOn(new UserModel(), 'save')
       mockSaveUser.mockImplementation(jest.fn().mockReturnValueOnce(usersMock[0]));
 
-      const payload = usersMock[0];
       const response = await request(app).post('/users').send(payload);
 
       expect(response.status).toBe(201);
@@ -93,7 +93,6 @@ describe('User Routes - API requests success and erros', () => {
       const mockSaveUser = jest.spyOn(new UserModel(), 'save')
       mockSaveUser.mockImplementation(jest.fn().mockRejectedValue(new Error('Internal Server Error')));
 
-      const payload = usersMock[0];
       const response = await request(app).post('/users').send(payload);
 
       expect(response.status).toBe(500);
@@ -102,7 +101,6 @@ describe('User Routes - API requests success and erros', () => {
   });
   describe('PUT /users/:id', () => {
     it('responds with json user data', async () => {
-      const payload = usersMock[0];
       const response = await request(app).put('/users/123').send(payload);
 
       expect(response.status).toBe(200);
@@ -110,7 +108,6 @@ describe('User Routes - API requests success and erros', () => {
     });
 
     it('responds with 404 status if user not found', async () => {
-      const payload = usersMock[0];
       UserModel.findByIdAndUpdate = jest.fn().mockReturnValueOnce(undefined);
 
       const response = await request(app).put('/users/nonexistent_id').send(payload);
@@ -120,7 +117,6 @@ describe('User Routes - API requests success and erros', () => {
     });
 
     it('responds with 500 status if an error occurs', async () => {
-      const payload = usersMock[0];
       UserModel.findByIdAndUpdate = jest.fn().mockRejectedValue(new Error('Internal Server Error'));
 
       const response = await request(app).put('/users/123').send(payload);

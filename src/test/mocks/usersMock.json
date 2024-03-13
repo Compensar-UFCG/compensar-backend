@@ -1,9 +1,18 @@
 [
     {
-        "_id": "65e716cd6b58df0b9764fd06",
+        "id": "65f1dc6456c097d6c25ab519",
         "name": "Test",
         "username": "test.username",
-        "email": "email.test@gmail.com",
-        "password": "#Aa12345"
+        "email": "test@gmail.com",
+        "password": "$2b$10$eEwM2nZUfiu7m8his1Xb1uAgFwcZrG3ggdaHe47cno1ScOa9bJ5LG",
+        "__v": 0
+    },
+    {
+        "id": "65f1dc9656c097d6c25ab522",
+        "name": "Test",
+        "username": "test.username.1",
+        "email": "test1@gmail.com",
+        "password": "$2b$10$lXrtz2dkDjS5TAKY81lqnewmnfbl2aLsPB5xSKCMHvLUzJbfBLZ72",
+        "__v": 0
     }
 ]
