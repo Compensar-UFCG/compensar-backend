@@ -4,6 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "build": "tsc",
+    "start": "node dist/server.js",
     "dev": "npx ts-node src/server.ts",
     "test": "jest --coverage",
     "lint": "eslint ."
