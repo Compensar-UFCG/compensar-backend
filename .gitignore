@@ -1,6 +1,3 @@
-# Arquivos gerados pelo TypeScript
-/dist/
-
 # Dependências instaladas pelo npm
 /node_modules/
 
