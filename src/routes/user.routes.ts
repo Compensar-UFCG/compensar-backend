@@ -8,9 +8,8 @@ const router: Router = Router();
 
 router.get('/users', async (_: Request, res: Response) => {
   try {
-    const users = await User.find();
-    const usersNoSensitiveInformation = users.map(user => { return { name: user.name, email: user.email }})
-    res.status(200).json(usersNoSensitiveInformation);
+    const users = await User.find({}, { password: 0 });
+    res.status(200).json(users);
   } catch (err) {
     const error = getErrorObject(err);
     res.status(error.status).json(error);
@@ -21,11 +20,11 @@ router.get('/users/:id', async (req: Request, res: Response) => {
   const id = req.params.id;
 
   try {
-    const user = await User.findById(id);
+    const user = await User.findById(id, { password: 0 });
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
-    res.status(200).json({ name: user.name, email: user.email });
+    res.status(200).json(user);
   } catch (err) {
     const error = getErrorObject(err);
     res.status(error.status).json(error);
