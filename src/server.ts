@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import bodyParser from 'body-parser';
 import competenceRoutes from './routes/competence.routes';
 import userRoutes from './routes/user.routes';
+import loginRoutes from './routes/login.routes';
 
 import dotenv from 'dotenv';
 
@@ -14,6 +15,7 @@ const PORT = process.env.PORT || 8080;
 app.use(bodyParser.json());
 app.use('/api', competenceRoutes);
 app.use('/api', userRoutes);
+app.use('/api', loginRoutes);
 
 mongoose.connect(`mongodb+srv://${process.env.MONGO_DB_USER}:${process.env.MONGO_DB_PASSWORD}@cluster0.beoiebt.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`)
   .then(() => {
