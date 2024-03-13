@@ -2,6 +2,7 @@ import { Router, Request, Response } from 'express';
 import User from '../models/user.model';
 import { checkIsValidUserBody, sanitizationUserBody, userValidationSchema } from '../utils/users.validation';
 import { getErrorObject } from '../utils/error';
+import { hashPassword } from '../utils/securityData';
 
 const router: Router = Router();
 
@@ -36,14 +37,18 @@ router.post('/users', sanitizationUserBody, userValidationSchema, async (req: Re
 
   if(isError) return res.status(422).json({ message })
 
-  const user = new User({
-    name: req.body.name,
-    username: req.body.username,
-    email: req.body.email,
-    password: req.body.password,
-  });
+  const { name, username, email, password } = req.body;
 
   try {
+    const hashedPassword = await hashPassword(password);
+
+    const user = new User({
+      name,
+      username,
+      email,
+      password: hashedPassword,
+    });
+
     const newUser = await user.save();
     res.status(201).json({ message: `Created '${newUser.username}' with success`});
   } catch (err) {
@@ -58,12 +63,11 @@ router.put('/users/:id', sanitizationUserBody, userValidationSchema, async (req:
   if(isError) return res.status(422).json({ message })
 
   const id = req.params.id;
-  const { username, email, password } = req.body;
-
-  //TODO: Adicionar autorizacao
+  const { name, username, email, password } = req.body;
 
   try {
-    const user = await User.findByIdAndUpdate(id, { username, email, password }, { new: true });
+    const hashedPassword = await hashPassword(password);
+    const user = await User.findByIdAndUpdate(id, { name, username, email, hashedPassword }, { new: true });
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
@@ -76,7 +80,6 @@ router.put('/users/:id', sanitizationUserBody, userValidationSchema, async (req:
 
 router.delete('/users/:id', async (req: Request, res: Response) => {
   const id = req.params.id;
-  //TODO: Adicionar autorizacao
 
   try {
     const user = await User.findByIdAndDelete(id);
