@@ -169,7 +169,7 @@ describe('Competence Routes - sanitization and validation body errors', () => {
         const response = await request(app).put('/competences/123').send(payload);
 
         expect(response.status).toBe(422);
-        expect(response.body.message).toMatch(competenceErrorMessages.titleEmpty);
+        expect(response.body.message).toContain(competenceErrorMessages.titleEmpty);
       });
 
       it('return error when try edit a competence with a title empty', async () => {
@@ -177,7 +177,7 @@ describe('Competence Routes - sanitization and validation body errors', () => {
         const response = await request(app).put('/competences/123').send(payload);
 
         expect(response.status).toBe(422);
-        expect(response.body.message).toMatch(competenceErrorMessages.titleEmpty);
+        expect(response.body.message).toContain(competenceErrorMessages.titleEmpty);
       });
 
       it('return error when try edit a competence with a title empty', async () => {
@@ -185,7 +185,7 @@ describe('Competence Routes - sanitization and validation body errors', () => {
         const response = await request(app).put('/competences/123').send(payload);
 
         expect(response.status).toBe(422);
-        expect(response.body.message).toMatch(competenceErrorMessages.titleEmpty);
+        expect(response.body.message).toContain(competenceErrorMessages.titleEmpty);
       });
 
       it('return error when try edit a competence title with no length min', async () => {
@@ -193,7 +193,7 @@ describe('Competence Routes - sanitization and validation body errors', () => {
         const response = await request(app).put('/competences/123').send(payload);
 
         expect(response.status).toBe(422);
-        expect(response.body.message).toMatch(competenceErrorMessages.titleLength);
+        expect(response.body.message).toContain(competenceErrorMessages.titleLength);
       });
 
       it('return error when try edit a competence title with length more then max', async () => {
@@ -201,7 +201,7 @@ describe('Competence Routes - sanitization and validation body errors', () => {
         const response = await request(app).put('/competences/123').send(payload);
 
         expect(response.status).toBe(422);
-        expect(response.body.message).toMatch(competenceErrorMessages.titleLength);
+        expect(response.body.message).toContain(competenceErrorMessages.titleLength);
       });
 
       it('return success when try edit a competence title with length min', async () => {
@@ -224,7 +224,7 @@ describe('Competence Routes - sanitization and validation body errors', () => {
         const response = await request(app).put('/competences/123').send(payload);
 
         expect(response.status).toBe(422);
-        expect(response.body.message).toMatch(competenceErrorMessages.descriptionEmpty);
+        expect(response.body.message).toContain(competenceErrorMessages.descriptionEmpty);
       });
 
       it('return error when try edit a competence with a description empty', async () => {
@@ -232,7 +232,7 @@ describe('Competence Routes - sanitization and validation body errors', () => {
         const response = await request(app).put('/competences/123').send(payload);
 
         expect(response.status).toBe(422);
-        expect(response.body.message).toMatch(competenceErrorMessages.descriptionEmpty);
+        expect(response.body.message).toContain(competenceErrorMessages.descriptionEmpty);
       });
 
       it('return error when try edit a competence with a description empty', async () => {
@@ -240,7 +240,7 @@ describe('Competence Routes - sanitization and validation body errors', () => {
         const response = await request(app).put('/competences/123').send(payload);
 
         expect(response.status).toBe(422);
-        expect(response.body.message).toMatch(competenceErrorMessages.descriptionEmpty);
+        expect(response.body.message).toContain(competenceErrorMessages.descriptionEmpty);
       });
 
       it('return error when try edit a competence description with no length min', async () => {
@@ -248,7 +248,7 @@ describe('Competence Routes - sanitization and validation body errors', () => {
         const response = await request(app).put('/competences/123').send(payload);
 
         expect(response.status).toBe(422);
-        expect(response.body.message).toMatch(competenceErrorMessages.descriptionLength);
+        expect(response.body.message).toContain(competenceErrorMessages.descriptionLength);
       });
 
       it('return error when try edit a competence description with length more then max', async () => {
@@ -256,7 +256,7 @@ describe('Competence Routes - sanitization and validation body errors', () => {
         const response = await request(app).put('/competences/123').send(payload);
 
         expect(response.status).toBe(422);
-        expect(response.body.message).toMatch(competenceErrorMessages.descriptionLength);
+        expect(response.body.message).toContain(competenceErrorMessages.descriptionLength);
       });
 
       it('return success when try edit a competence description with length min', async () => {
@@ -279,8 +279,8 @@ describe('Competence Routes - sanitization and validation body errors', () => {
         const response = await request(app).put('/competences/123').send(payload);
 
         expect(response.status).toBe(422);
-        expect(response.body.message).toMatch(competenceErrorMessages.titleEmpty);
-        expect(response.body.message).toMatch(competenceErrorMessages.descriptionEmpty);
+        expect(response.body.message).toContain(competenceErrorMessages.titleEmpty);
+        expect(response.body.message).toContain(competenceErrorMessages.descriptionEmpty);
       });
 
       it('return error when try edit a competence with a title and description empties', async () => {
@@ -288,8 +288,8 @@ describe('Competence Routes - sanitization and validation body errors', () => {
         const response = await request(app).put('/competences/123').send(payload);
 
         expect(response.status).toBe(422);
-        expect(response.body.message).toMatch(competenceErrorMessages.titleEmpty);
-        expect(response.body.message).toMatch(competenceErrorMessages.descriptionEmpty);
+        expect(response.body.message).toContain(competenceErrorMessages.titleEmpty);
+        expect(response.body.message).toContain(competenceErrorMessages.descriptionEmpty);
       });
 
       it('return error when try edit a competence with a title and description empties', async () => {
@@ -297,8 +297,8 @@ describe('Competence Routes - sanitization and validation body errors', () => {
         const response = await request(app).put('/competences/123').send(payload);
 
         expect(response.status).toBe(422);
-        expect(response.body.message).toMatch(competenceErrorMessages.titleEmpty);
-        expect(response.body.message).toMatch(competenceErrorMessages.descriptionEmpty);
+        expect(response.body.message).toContain(competenceErrorMessages.titleEmpty);
+        expect(response.body.message).toContain(competenceErrorMessages.descriptionEmpty);
       });
 
       it('return error when try edit a competence title and description with no length min', async () => {
@@ -306,8 +306,8 @@ describe('Competence Routes - sanitization and validation body errors', () => {
         const response = await request(app).put('/competences/123').send(payload);
 
         expect(response.status).toBe(422);
-        expect(response.body.message).toMatch(competenceErrorMessages.titleLength);
-        expect(response.body.message).toMatch(competenceErrorMessages.descriptionLength);
+        expect(response.body.message).toContain(competenceErrorMessages.titleLength);
+        expect(response.body.message).toContain(competenceErrorMessages.descriptionLength);
       });
 
       it('return error when try edit a competence title and description with length more then max', async () => {
@@ -318,8 +318,8 @@ describe('Competence Routes - sanitization and validation body errors', () => {
         const response = await request(app).put('/competences/123').send(payload);
 
         expect(response.status).toBe(422);
-        expect(response.body.message).toMatch(competenceErrorMessages.titleLength);
-        expect(response.body.message).toMatch(competenceErrorMessages.descriptionLength);
+        expect(response.body.message).toContain(competenceErrorMessages.titleLength);
+        expect(response.body.message).toContain(competenceErrorMessages.descriptionLength);
       });
     });
   });
@@ -335,7 +335,7 @@ describe('Competence Routes - sanitization and validation body errors', () => {
         const response = await request(app).post('/competences').send(payload);
 
         expect(response.status).toBe(422);
-        expect(response.body.message).toMatch(competenceErrorMessages.titleEmpty);
+        expect(response.body.message).toContain(competenceErrorMessages.titleEmpty);
       });
 
       it('return error when try edit a competence with a title empty', async () => {
@@ -343,7 +343,7 @@ describe('Competence Routes - sanitization and validation body errors', () => {
         const response = await request(app).post('/competences').send(payload);
 
         expect(response.status).toBe(422);
-        expect(response.body.message).toMatch(competenceErrorMessages.titleEmpty);
+        expect(response.body.message).toContain(competenceErrorMessages.titleEmpty);
       });
 
       it('return error when try edit a competence with a title empty', async () => {
@@ -351,7 +351,7 @@ describe('Competence Routes - sanitization and validation body errors', () => {
         const response = await request(app).post('/competences').send(payload);
 
         expect(response.status).toBe(422);
-        expect(response.body.message).toMatch(competenceErrorMessages.titleEmpty);
+        expect(response.body.message).toContain(competenceErrorMessages.titleEmpty);
       });
 
       it('return error when try edit a competence title with no length min', async () => {
@@ -359,7 +359,7 @@ describe('Competence Routes - sanitization and validation body errors', () => {
         const response = await request(app).post('/competences').send(payload);
 
         expect(response.status).toBe(422);
-        expect(response.body.message).toMatch(competenceErrorMessages.titleLength);
+        expect(response.body.message).toContain(competenceErrorMessages.titleLength);
       });
 
       it('return error when try edit a competence title with length more then max', async () => {
@@ -367,7 +367,7 @@ describe('Competence Routes - sanitization and validation body errors', () => {
         const response = await request(app).post('/competences').send(payload);
 
         expect(response.status).toBe(422);
-        expect(response.body.message).toMatch(competenceErrorMessages.titleLength);
+        expect(response.body.message).toContain(competenceErrorMessages.titleLength);
       });
 
       it('return success when try edit a competence title with length min', async () => {
@@ -390,7 +390,7 @@ describe('Competence Routes - sanitization and validation body errors', () => {
         const response = await request(app).post('/competences').send(payload);
 
         expect(response.status).toBe(422);
-        expect(response.body.message).toMatch(competenceErrorMessages.descriptionEmpty);
+        expect(response.body.message).toContain(competenceErrorMessages.descriptionEmpty);
       });
 
       it('return error when try edit a competence with a description empty', async () => {
@@ -398,7 +398,7 @@ describe('Competence Routes - sanitization and validation body errors', () => {
         const response = await request(app).post('/competences').send(payload);
 
         expect(response.status).toBe(422);
-        expect(response.body.message).toMatch(competenceErrorMessages.descriptionEmpty);
+        expect(response.body.message).toContain(competenceErrorMessages.descriptionEmpty);
       });
 
       it('return error when try edit a competence with a description empty', async () => {
@@ -406,7 +406,7 @@ describe('Competence Routes - sanitization and validation body errors', () => {
         const response = await request(app).post('/competences').send(payload);
 
         expect(response.status).toBe(422);
-        expect(response.body.message).toMatch(competenceErrorMessages.descriptionEmpty);
+        expect(response.body.message).toContain(competenceErrorMessages.descriptionEmpty);
       });
 
       it('return error when try edit a competence description with no length min', async () => {
@@ -414,7 +414,7 @@ describe('Competence Routes - sanitization and validation body errors', () => {
         const response = await request(app).post('/competences').send(payload);
 
         expect(response.status).toBe(422);
-        expect(response.body.message).toMatch(competenceErrorMessages.descriptionLength);
+        expect(response.body.message).toContain(competenceErrorMessages.descriptionLength);
       });
 
       it('return error when try edit a competence description with length more then max', async () => {
@@ -422,7 +422,7 @@ describe('Competence Routes - sanitization and validation body errors', () => {
         const response = await request(app).post('/competences').send(payload);
 
         expect(response.status).toBe(422);
-        expect(response.body.message).toMatch(competenceErrorMessages.descriptionLength);
+        expect(response.body.message).toContain(competenceErrorMessages.descriptionLength);
       });
 
       it('return success when try edit a competence description with length min', async () => {
@@ -445,8 +445,8 @@ describe('Competence Routes - sanitization and validation body errors', () => {
         const response = await request(app).post('/competences').send(payload);
 
         expect(response.status).toBe(422);
-        expect(response.body.message).toMatch(competenceErrorMessages.titleEmpty);
-        expect(response.body.message).toMatch(competenceErrorMessages.descriptionEmpty);
+        expect(response.body.message).toContain(competenceErrorMessages.titleEmpty);
+        expect(response.body.message).toContain(competenceErrorMessages.descriptionEmpty);
       });
 
       it('return error when try edit a competence with a title and description empties', async () => {
@@ -454,8 +454,8 @@ describe('Competence Routes - sanitization and validation body errors', () => {
         const response = await request(app).post('/competences').send(payload);
 
         expect(response.status).toBe(422);
-        expect(response.body.message).toMatch(competenceErrorMessages.titleEmpty);
-        expect(response.body.message).toMatch(competenceErrorMessages.descriptionEmpty);
+        expect(response.body.message).toContain(competenceErrorMessages.titleEmpty);
+        expect(response.body.message).toContain(competenceErrorMessages.descriptionEmpty);
       });
 
       it('return error when try edit a competence with a title and description empties', async () => {
@@ -463,8 +463,8 @@ describe('Competence Routes - sanitization and validation body errors', () => {
         const response = await request(app).post('/competences').send(payload);
 
         expect(response.status).toBe(422);
-        expect(response.body.message).toMatch(competenceErrorMessages.titleEmpty);
-        expect(response.body.message).toMatch(competenceErrorMessages.descriptionEmpty);
+        expect(response.body.message).toContain(competenceErrorMessages.titleEmpty);
+        expect(response.body.message).toContain(competenceErrorMessages.descriptionEmpty);
       });
 
       it('return error when try edit a competence title and description with no length min', async () => {
@@ -472,8 +472,8 @@ describe('Competence Routes - sanitization and validation body errors', () => {
         const response = await request(app).post('/competences').send(payload);
 
         expect(response.status).toBe(422);
-        expect(response.body.message).toMatch(competenceErrorMessages.titleLength);
-        expect(response.body.message).toMatch(competenceErrorMessages.descriptionLength);
+        expect(response.body.message).toContain(competenceErrorMessages.titleLength);
+        expect(response.body.message).toContain(competenceErrorMessages.descriptionLength);
       });
 
       it('return error when try edit a competence title and description with length more then max', async () => {
@@ -484,8 +484,8 @@ describe('Competence Routes - sanitization and validation body errors', () => {
         const response = await request(app).post('/competences').send(payload);
 
         expect(response.status).toBe(422);
-        expect(response.body.message).toMatch(competenceErrorMessages.titleLength);
-        expect(response.body.message).toMatch(competenceErrorMessages.descriptionLength);
+        expect(response.body.message).toContain(competenceErrorMessages.titleLength);
+        expect(response.body.message).toContain(competenceErrorMessages.descriptionLength);
       });
     });
   });
