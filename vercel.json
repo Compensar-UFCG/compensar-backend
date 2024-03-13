@@ -1,6 +1,5 @@
 {
   "version": 2,
-  "buildCommand": "tsc",
   "builds": [
     {
       "src": "./dist/server.js",
