@@ -98,6 +98,26 @@ describe('User Routes - API requests success and erros', () => {
       expect(response.status).toBe(500);
       expect(response.body).toMatchObject({ message: 'Internal Server Error' });
     });
+
+    it('responds with exist user account with this email', async () => {
+      const mockSaveUser = jest.spyOn(new UserModel(), 'save')
+      mockSaveUser.mockImplementation(jest.fn().mockRejectedValue({ message: `E11000 duplicate key error collection: test.users index: username_1 dup key`, keyValue: { email: payload.email}}));
+
+      const response = await request(app).post('/users').send(payload);
+
+      expect(response.status).toBe(409);
+      expect(response.body).toEqual({ message: `Exist user with: ${payload.email}` });
+    });
+
+    it('responds with exist user account with this username', async () => {
+      const mockSaveUser = jest.spyOn(new UserModel(), 'save')
+      mockSaveUser.mockImplementation(jest.fn().mockRejectedValue({ message: `E11000 duplicate key error collection: test.users index: username_1 dup key`, keyValue: { username: payload.username}}));
+
+      const response = await request(app).post('/users').send(payload);
+
+      expect(response.status).toBe(409);
+      expect(response.body).toEqual({ message: `Exist user with: ${payload.username}` });
+    });
   });
   describe('PUT /users/:id', () => {
     it('responds with json user data', async () => {
@@ -123,6 +143,24 @@ describe('User Routes - API requests success and erros', () => {
 
       expect(response.status).toBe(500);
       expect(response.body).toMatchObject({ message: 'Internal Server Error' });
+    });
+
+    it('responds with exist user account with this email', async () => {
+      UserModel.findByIdAndUpdate = jest.fn().mockRejectedValue({ message: `E11000 duplicate key error collection: test.users index: username_1 dup key`, keyValue: { email: payload.email}});
+
+      const response = await request(app).put('/users/123').send(payload);
+
+      expect(response.status).toBe(409);
+      expect(response.body).toEqual({ message: `Exist user with: ${payload.email}` });
+    });
+
+    it('responds with exist user account with this username', async () => {
+      UserModel.findByIdAndUpdate = jest.fn().mockRejectedValue({ message: `E11000 duplicate key error collection: test.users index: username_1 dup key`, keyValue: { username: payload.username}});
+
+      const response = await request(app).put('/users/123').send(payload);
+
+      expect(response.status).toBe(409);
+      expect(response.body).toEqual({ message: `Exist user with: ${payload.username}` });
     });
   });
 
