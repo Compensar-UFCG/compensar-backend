@@ -59,8 +59,12 @@ router.post('/users', users_validation_1.sanitizationUserBody, users_validation_
         res.status(201).json({ message: `Created '${newUser.username}' with success` });
     }
     catch (err) {
-        const error = (0, error_1.getErrorObject)(err);
-        res.status(error.status).json(error);
+        if (err.message.includes('duplicate key'))
+            res.status(409).json({ message: `Exist user with: ${err.keyValue.email || err.keyValue.username}` });
+        else {
+            const error = (0, error_1.getErrorObject)(err);
+            res.status(error.status).json(error);
+        }
     }
 }));
 router.put('/users/:id', users_validation_1.sanitizationUserBody, users_validation_1.userValidationSchema, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -78,8 +82,12 @@ router.put('/users/:id', users_validation_1.sanitizationUserBody, users_validati
         res.json({ message: `Updated '${user.username}' with success` });
     }
     catch (err) {
-        const error = (0, error_1.getErrorObject)(err);
-        res.status(error.status).json(error);
+        if (err.message.includes('duplicate key'))
+            res.status(409).json({ message: `Exist user with: ${err.keyValue.email || err.keyValue.username}` });
+        else {
+            const error = (0, error_1.getErrorObject)(err);
+            res.status(error.status).json(error);
+        }
     }
 }));
 router.delete('/users/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
