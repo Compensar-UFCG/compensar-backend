@@ -51,8 +51,12 @@ router.post('/users', sanitizationUserBody, userValidationSchema, async (req: Re
     const newUser = await user.save();
     res.status(201).json({ message: `Created '${newUser.username}' with success`});
   } catch (err) {
-    const error = getErrorObject(err);
-    res.status(error.status).json(error);
+    if(err.message.includes('duplicate key'))
+      res.status(409).json({ message: `Exist user with: ${err.keyValue.email || err.keyValue.username}`})
+    else {
+      const error = getErrorObject(err);
+      res.status(error.status).json(error);
+    }
   }
 });
 
@@ -72,8 +76,12 @@ router.put('/users/:id', sanitizationUserBody, userValidationSchema, async (req:
     }
     res.json({ message: `Updated '${user.username}' with success`});
   } catch (err) {
-    const error = getErrorObject(err);
-    res.status(error.status).json(error);
+    if(err.message.includes('duplicate key'))
+      res.status(409).json({ message: `Exist user with: ${err.keyValue.email || err.keyValue.username}`})
+    else {
+      const error = getErrorObject(err);
+      res.status(error.status).json(error);
+    }
   }
 });
 
