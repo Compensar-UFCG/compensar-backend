@@ -2,6 +2,7 @@ import express, { Application } from 'express';
 import mongoose from 'mongoose';
 import bodyParser from 'body-parser';
 import competenceRoutes from './routes/competence.routes';
+import questionRoutes from './routes/question.routes';
 import userRoutes from './routes/user.routes';
 import loginRoutes from './routes/login.routes';
 
@@ -14,6 +15,7 @@ const PORT = process.env.PORT || 8080;
 
 app.use(bodyParser.json());
 app.use('/api', competenceRoutes);
+app.use('/api', questionRoutes);
 app.use('/api', userRoutes);
 app.use('/api', loginRoutes);
 
