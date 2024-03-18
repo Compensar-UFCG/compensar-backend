@@ -101,7 +101,7 @@ describe('User Routes - API requests success and erros', () => {
 
     it('responds with exist user account with this email', async () => {
       const mockSaveUser = jest.spyOn(new UserModel(), 'save')
-      mockSaveUser.mockImplementation(jest.fn().mockRejectedValue({ message: `E11000 duplicate key error collection: test.users index: username_1 dup key: { email: \"${payload.email}\" }`, keyValue: { email: payload.email}}));
+      mockSaveUser.mockImplementation(jest.fn().mockRejectedValue({ message: `E11000 duplicate key error collection: test.users index: username_1 dup key`, keyValue: { email: payload.email}}));
 
       const response = await request(app).post('/users').send(payload);
 
@@ -111,7 +111,7 @@ describe('User Routes - API requests success and erros', () => {
 
     it('responds with exist user account with this username', async () => {
       const mockSaveUser = jest.spyOn(new UserModel(), 'save')
-      mockSaveUser.mockImplementation(jest.fn().mockRejectedValue({ message: `E11000 duplicate key error collection: test.users index: username_1 dup key: { username: \"${payload.username}\" }`, keyValue: { username: payload.username}}));
+      mockSaveUser.mockImplementation(jest.fn().mockRejectedValue({ message: `E11000 duplicate key error collection: test.users index: username_1 dup key`, keyValue: { username: payload.username}}));
 
       const response = await request(app).post('/users').send(payload);
 
@@ -146,7 +146,7 @@ describe('User Routes - API requests success and erros', () => {
     });
 
     it('responds with exist user account with this email', async () => {
-      UserModel.findByIdAndUpdate = jest.fn().mockRejectedValue({ message: `E11000 duplicate key error collection: test.users index: username_1 dup key: { email: \"${payload.email}\" }`, keyValue: { email: payload.email}});
+      UserModel.findByIdAndUpdate = jest.fn().mockRejectedValue({ message: `E11000 duplicate key error collection: test.users index: username_1 dup key`, keyValue: { email: payload.email}});
 
       const response = await request(app).put('/users/123').send(payload);
 
@@ -155,7 +155,7 @@ describe('User Routes - API requests success and erros', () => {
     });
 
     it('responds with exist user account with this username', async () => {
-      UserModel.findByIdAndUpdate = jest.fn().mockRejectedValue({ message: `E11000 duplicate key error collection: test.users index: username_1 dup key: { username: \"${payload.username}\" }`, keyValue: { username: payload.username}});
+      UserModel.findByIdAndUpdate = jest.fn().mockRejectedValue({ message: `E11000 duplicate key error collection: test.users index: username_1 dup key`, keyValue: { username: payload.username}});
 
       const response = await request(app).put('/users/123').send(payload);
 
