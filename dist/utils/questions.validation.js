@@ -4,7 +4,7 @@ exports.checkIsValidQuestionBody = exports.sanitizationQuestionBody = exports.qu
 const express_validator_1 = require("express-validator");
 const error_1 = require("./error");
 const MIN_LENGTH = 3;
-const MAX_LENGTH_RESPONSE = 100;
+const MAX_LENGTH_RESPONSE = 255;
 const MAX_LENGTH_TITLE = 100;
 const MAX_LENGTH_TYPE = 50;
 exports.questionErrorMessages = {
