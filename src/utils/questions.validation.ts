@@ -3,7 +3,7 @@ import { body, checkSchema, Result, ValidationError, validationResult } from 'ex
 import { allErrorMessage } from './error';
 
 const MIN_LENGTH=3;
-const MAX_LENGTH_RESPONSE=100;
+const MAX_LENGTH_RESPONSE=255;
 const MAX_LENGTH_TITLE=100;
 const MAX_LENGTH_TYPE=50;
 

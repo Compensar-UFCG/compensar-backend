@@ -727,7 +727,7 @@ describe('Question Routes - sanitization and validation body errors', () => {
           statement: "statement",
           type: "type",
           font: "enem",
-          response: "Adding a response with length more than 100 characteres. So returns error message, because the title!"
+          response: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum sed tristique turpis. Ut ac sem vitae felis dictum venenatis ac sed eros. Suspendisse potenti. Vestibulum non mattis purus. Vivamus varius nisi vel elit convallis, non varius ligula placer"
         }
         const response = await request(app).put('/questions/123').send(payload);
   
@@ -1324,7 +1324,7 @@ describe('Question Routes - sanitization and validation body errors', () => {
           statement: "statement",
           type: "type",
           font: "enem",
-          response: "Adding a response with length more than 100 characteres. So returns error message, because the title!"
+          response: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum sed tristique turpis. Ut ac sem vitae felis dictum venenatis ac sed eros. Suspendisse potenti. Vestibulum non mattis purus. Vivamus varius nisi vel elit convallis, non varius ligula placer"
         }
         const response = await request(app).post('/questions').send(payload);
   
@@ -1339,7 +1339,7 @@ describe('Question Routes - sanitization and validation body errors', () => {
           statement: "statement",
           type: "type",
           font: "enem",
-          response: "Adding a response with length more than 100 characteres. So returns error message, because the title"
+          response: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum sed tristique turpis. Ut ac sem vitae felis dictum venenatis ac sed eros. Suspendisse potenti. Vestibulum non mattis purus. Vivamus varius nisi vel elit convallis, non varius ligula place"
         }
         const response = await request(app).post('/questions').send(payload);
   
