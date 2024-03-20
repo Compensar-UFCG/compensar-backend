@@ -76,7 +76,7 @@ router.post('/questions/competences', async (req: Request, res: Response) => {
     const existingRelation = await CompetenceQuestion.findOne({ competence: competenceId, question: questionId });
 
     if(existingRelation)
-      res.status(409).json({ message: 'Exist relation' });
+      return res.status(409).json({ message: 'Exist relation' });
 
     const competenceQuestion = new CompetenceQuestion({
       competence: competenceId,
