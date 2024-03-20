@@ -1,0 +1,17 @@
+{
+    "title": "Questão 141 da prova azul do segundo dia do Enem 2012",
+    "competences": [
+        {
+            "_id": "65e716cd6b58df0b9764fd06",
+            "title": "Coleta de Dados",
+            "description": "Obter ou gerar dados através de observações empíricas ou de figuras, tabelas, listas, gráficos, etc. Os dados obtidos devem ser usados para auxiliar na resolução do problema proposto.",
+            "__v": 0
+        },
+        {
+            "_id": "65e717356b58df0b9764fd09",
+            "title": "Análise de Dados",
+            "description": "Interpretar informações a partir de dados fornecidos ou identificados. Essas informações devem ser usadas para dar sentido aos dados coletados e posteriormente suportar a resolução do problema proposto.",
+            "__v": 0
+        }
+    ]
+}
