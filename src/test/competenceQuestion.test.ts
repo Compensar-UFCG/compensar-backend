@@ -15,7 +15,7 @@ import competencesByQuestionIdMock from "./mocks/competenceQuestionAfter/compete
 import questionsByCompetenceIdMock from "./mocks/competenceQuestionAfter/questionsByCompetenceIdMock.json";
 
 import competencesMock from "./mocks/competencesMock.json";
-import questionsMock from "./mocks/questionsMock.json";
+import questionsMock from "./mocks/questionsWithoutCompetencesMock.json";
 
 const app = express();
 
