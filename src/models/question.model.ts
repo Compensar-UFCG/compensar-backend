@@ -5,7 +5,7 @@ import { UUID } from 'crypto';
 type Font = "enem" | "pisa" | "olimpiadas" | "school" | "other"
 type Alternatives = string[];
 
-interface Question {
+export interface Question {
   id: UUID;
   title: string;
   statement: string;
