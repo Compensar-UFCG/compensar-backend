@@ -1,0 +1,20 @@
+[
+    {
+        "_id": "65f374d89eacb37fa06091bb",
+        "title": "Questão 141 da prova azul do segundo dia do Enem 2012",
+        "statement": "Um forro retangular de tecido traz em sua etiqueta a informação de que encolherá após a primeira lavagem mantendo, entretanto, seu formato. A figura a seguir mostra as medidas originais do forro e o tamanho do encolhimento (x) no comprimento e (y) na largura. A expressão algébrica que representa a área do forro após ser lavado é (5 – x) (3 – y).",
+        "image": "https:&#x2F;&#x2F;d2q576s0wzfxtl.cloudfront.net&#x2F;2017&#x2F;08&#x2F;08150112&#x2F;141-1.png",
+        "type": "mathematics",
+        "font": "enem",
+        "year": 2012,
+        "alternatives": [
+            "2xy",
+            "15 − 3x",
+            "15 − 5y",
+            "−5y − 3x",
+            "5y + 3x − xy"
+        ],
+        "response": "5y + 3x − xy",
+        "__v": 0
+    }
+]

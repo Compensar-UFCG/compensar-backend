@@ -1,0 +1,42 @@
+{
+    "id": "65e717356b58df0b9764fd09",
+    "title": "Análise de Dados",
+    "questions": [
+        {
+            "_id": "65f374d89eacb37fa06091bb",
+            "title": "Questão 141 da prova azul do segundo dia do Enem 2012",
+            "statement": "Um forro retangular de tecido traz em sua etiqueta a informação de que encolherá após a primeira lavagem mantendo, entretanto, seu formato. A figura a seguir mostra as medidas originais do forro e o tamanho do encolhimento (x) no comprimento e (y) na largura. A expressão algébrica que representa a área do forro após ser lavado é (5 – x) (3 – y).",
+            "image": "https:&#x2F;&#x2F;d2q576s0wzfxtl.cloudfront.net&#x2F;2017&#x2F;08&#x2F;08150112&#x2F;141-1.png",
+            "type": "mathematics",
+            "font": "enem",
+            "year": 2012,
+            "alternatives": [
+                "2xy",
+                "15 − 3x",
+                "15 − 5y",
+                "−5y − 3x",
+                "5y + 3x − xy"
+            ],
+            "response": "5y + 3x − xy",
+            "__v": 0
+        },
+        {
+            "_id": "65f8dca475aca9ea2c068c44",
+            "title": "Questão 177 da prova azul do segundo dia do Enem 2011",
+            "statement": "Considere que uma pessoa decida investir uma determinada quantia e que lhe sejam apresentadas possibilidades de investimento com rentabilidades líquidas garantidas pelo período de um ano conforme descritas:\n Investimento A: 3% ao mês\n Investimento B: 36% ao ano\n Investimento C: 18% ao semestre\n As rentabilidades, para esses investimentos, incidem sobre o valor do período anterior. O quadro fornece algumas aproximações para a análise das rentabilidades:",
+            "image": "https:&#x2F;&#x2F;d2q576s0wzfxtl.cloudfront.net&#x2F;2017&#x2F;08&#x2F;08150519&#x2F;Q177-ENEM2011.png",
+            "type": "matemática",
+            "font": "enem",
+            "year": 2011,
+            "alternatives": [
+                "escolher qualquer um dos investimentos A, B ou C, pois as suas rentabilidades anuais são iguais a 36%.",
+                "escolher os investimentos A ou C, pois suas rentabilidades anuais são iguais a 39%.",
+                "escolher o investimento A, pois a sua rentabilidade anual é maior que as rentabilidades anuais dos investimentos B e C.",
+                "escolher o investimento B, pois sua rentabilidade de 36% é maior que as rentabilidades de 3% do investimento A e de 18% do investimento C.",
+                "escolher o investimento C, pois sua rentabilidade de 39% ao ano é maior que a rentabilidade de 36% ao ano dos investimentos A e B."
+            ],
+            "response": "escolher o investimento A, pois a sua rentabilidade anual é maior que as rentabilidades anuais dos investimentos B e C.",
+            "__v": 0
+        }
+    ]
+}

@@ -1,7 +1,7 @@
 import { Schema, model, Document } from 'mongoose';
 
 import { UUID } from "crypto";
-interface Competence extends Document{
+export interface Competence extends Document{
   id: UUID
   title: string;
   description: string;

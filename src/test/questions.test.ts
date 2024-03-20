@@ -1,9 +1,16 @@
-import request from 'supertest';
-import router from '../routes/question.routes';
-import questionsMock from "./mocks/questionsMock.json";
 import express from 'express';
-import QuestionModel from '../models/question.model';
 import bodyParser from 'body-parser';
+
+import request from 'supertest';
+import router, * as utils from '../routes/question.routes';
+
+import QuestionModel from '../models/question.model';
+import CompetenceQuestionModel from '../models/competenceQuestion.model';
+
+import questionsWithCompetencesMock from "./mocks/questionsWithCompetencesMock.json";
+import questionsWithoutCompetencesMock from "./mocks/questionsWithoutCompetencesMock.json";
+import competencesByQuestionIdUnhandledMock from "./mocks/competenceQuestionBefore/competencesByQuestionIdUnhandledMock.json";
+
 import { questionErrorMessages } from '../utils/questions.validation';
 
 const app = express();
@@ -14,13 +21,19 @@ app.use(router);
 
 jest.mock('../models/question.model');
 
-const payload = {...questionsMock[0], password: "#Aa12345" }
+const payload = {...questionsWithoutCompetencesMock[0], password: "#Aa12345" }
 describe('Question Routes - API requests success and erros', () => {
   beforeEach(() => {
-    QuestionModel.find = jest.fn().mockReturnValueOnce(questionsMock);
-    QuestionModel.findById = jest.fn().mockReturnValueOnce(questionsMock[0]);
-    QuestionModel.findByIdAndUpdate = jest.fn().mockReturnValueOnce(questionsMock[0]);
-    QuestionModel.findByIdAndDelete = jest.fn().mockReturnValueOnce(questionsMock[0]);
+    QuestionModel.find = jest.fn().mockReturnValueOnce(questionsWithoutCompetencesMock);
+    QuestionModel.findById = jest.fn().mockReturnValueOnce(questionsWithoutCompetencesMock[0]);
+    QuestionModel.findByIdAndUpdate = jest.fn().mockReturnValueOnce(questionsWithoutCompetencesMock[0]);
+    QuestionModel.findByIdAndDelete = jest.fn().mockReturnValueOnce(questionsWithoutCompetencesMock[0]);
+    CompetenceQuestionModel.find = jest.fn().mockImplementation(() => ({
+      populate: jest.fn().mockResolvedValue(competencesByQuestionIdUnhandledMock)
+    }))
+    Object.defineProperty(utils, 'getObject', {
+      value: jest.fn().mockReturnValue(questionsWithoutCompetencesMock[0])
+    })
   });
 
   describe('GET /questions', () => {
@@ -28,7 +41,7 @@ describe('Question Routes - API requests success and erros', () => {
       const response = await request(app).get('/questions');
 
       expect(response.status).toBe(200);
-      expect(response.body).toEqual(questionsMock);
+      expect(response.body).toEqual(questionsWithCompetencesMock);
     });
 
     it('responds with 500 status if an error occurs', async () => {
@@ -55,7 +68,7 @@ describe('Question Routes - API requests success and erros', () => {
       const response = await request(app).get('/questions/123');
 
       expect(response.status).toBe(200);
-      expect(response.body).toEqual(questionsMock[0]);
+      expect(response.body).toEqual(questionsWithCompetencesMock[0]);
     });
 
     it('responds with 404 status if question not found', async () => {
@@ -81,7 +94,7 @@ describe('Question Routes - API requests success and erros', () => {
 
     it('responds with json question data', async () => {
       const mockSaveQuestion = jest.spyOn(new QuestionModel(), 'save')
-      mockSaveQuestion.mockImplementation(jest.fn().mockReturnValueOnce(questionsMock[0]));
+      mockSaveQuestion.mockImplementation(jest.fn().mockReturnValueOnce(questionsWithoutCompetencesMock[0]));
 
       const response = await request(app).post('/questions').send(payload);
 
@@ -131,7 +144,7 @@ describe('Question Routes - API requests success and erros', () => {
       const response = await request(app).delete('/questions/123');
 
       expect(response.status).toBe(200);
-      expect(response.body).toEqual({ message: `Delete question '${questionsMock[0].title}' with success`});
+      expect(response.body).toEqual({ message: `Delete question '${questionsWithoutCompetencesMock[0].title}' with success`});
     }, 12);
 
     it('responds with 404 status if question not found', async () => {
@@ -157,7 +170,7 @@ describe('Question Routes - API requests success and erros', () => {
 describe('Question Routes - sanitization and validation body errors', () => {
   describe('PUT /questions/:id', () => {
     beforeEach(() => {
-      QuestionModel.findByIdAndUpdate = jest.fn().mockReturnValueOnce(questionsMock[0]);
+      QuestionModel.findByIdAndUpdate = jest.fn().mockReturnValueOnce(questionsWithoutCompetencesMock[0]);
     });
     it('update a question with empty payload and API return error', async () => {
       const payload = {}
@@ -182,7 +195,7 @@ describe('Question Routes - sanitization and validation body errors', () => {
       const response = await request(app).put('/questions/123').send(payload);
 
       expect(response.status).toBe(200);
-      expect(response.body).toEqual({ message: `Updated '${questionsMock[0].title}' with success` });
+      expect(response.body).toEqual({ message: `Updated '${questionsWithoutCompetencesMock[0].title}' with success` });
     })
 
     it('update a question and sanitization body and API return success', async () => {
@@ -196,7 +209,7 @@ describe('Question Routes - sanitization and validation body errors', () => {
       const response = await request(app).put('/questions/123').send(payload);
 
       expect(response.status).toBe(200);
-      expect(response.body.message).toEqual(`Updated '${questionsMock[0].title}' with success`);
+      expect(response.body.message).toEqual(`Updated '${questionsWithoutCompetencesMock[0].title}' with success`);
 
       expect(response.body.message).not.toContain(questionErrorMessages.titleEmpty);
       expect(response.body.message).not.toContain(questionErrorMessages.statementEmpty);
@@ -303,7 +316,7 @@ describe('Question Routes - sanitization and validation body errors', () => {
         const response = await request(app).put('/questions/123').send(payload);
   
         expect(response.status).toBe(200);
-        expect(response.body.message).toEqual(`Updated '${questionsMock[0].title}' with success`);
+        expect(response.body.message).toEqual(`Updated '${questionsWithoutCompetencesMock[0].title}' with success`);
       });
 
       it('renders success when add a title with max length', async () => {
@@ -317,7 +330,7 @@ describe('Question Routes - sanitization and validation body errors', () => {
         const response = await request(app).put('/questions/123').send(payload);
   
         expect(response.status).toBe(200);
-        expect(response.body.message).toEqual(`Updated '${questionsMock[0].title}' with success`);
+        expect(response.body.message).toEqual(`Updated '${questionsWithoutCompetencesMock[0].title}' with success`);
       });
     });
 
@@ -477,7 +490,7 @@ describe('Question Routes - sanitization and validation body errors', () => {
         const response = await request(app).put('/questions/123').send(payload);
   
         expect(response.status).toBe(200);
-        expect(response.body.message).toEqual(`Updated '${questionsMock[0].title}' with success`);
+        expect(response.body.message).toEqual(`Updated '${questionsWithoutCompetencesMock[0].title}' with success`);
       });
 
       it('renders success when add a type with max length', async () => {
@@ -491,7 +504,7 @@ describe('Question Routes - sanitization and validation body errors', () => {
         const response = await request(app).put('/questions/123').send(payload);
   
         expect(response.status).toBe(200);
-        expect(response.body.message).toEqual(`Updated '${questionsMock[0].title}' with success`);
+        expect(response.body.message).toEqual(`Updated '${questionsWithoutCompetencesMock[0].title}' with success`);
       });
 
     });
@@ -579,7 +592,7 @@ describe('Question Routes - sanitization and validation body errors', () => {
         const response = await request(app).put('/questions/123').send(payload);
   
         expect(response.status).toBe(200);
-        expect(response.body.message).toEqual(`Updated '${questionsMock[0].title}' with success`);
+        expect(response.body.message).toEqual(`Updated '${questionsWithoutCompetencesMock[0].title}' with success`);
       });
     });
 
@@ -612,7 +625,7 @@ describe('Question Routes - sanitization and validation body errors', () => {
         const response = await request(app).put('/questions/123').send(payload);
   
         expect(response.status).toBe(200);
-        expect(response.body.message).toEqual(`Updated '${questionsMock[0].title}' with success`);
+        expect(response.body.message).toEqual(`Updated '${questionsWithoutCompetencesMock[0].title}' with success`);
       });
 
       it('renders success when add valid font', async () => {
@@ -627,7 +640,7 @@ describe('Question Routes - sanitization and validation body errors', () => {
         const response = await request(app).put('/questions/123').send(payload);
   
         expect(response.status).toBe(200);
-        expect(response.body.message).toEqual(`Updated '${questionsMock[0].title}' with success`);
+        expect(response.body.message).toEqual(`Updated '${questionsWithoutCompetencesMock[0].title}' with success`);
       });
     });
 
@@ -660,7 +673,7 @@ describe('Question Routes - sanitization and validation body errors', () => {
         const response = await request(app).put('/questions/123').send(payload);
   
         expect(response.status).toBe(200);
-        expect(response.body.message).toEqual(`Updated '${questionsMock[0].title}' with success`);
+        expect(response.body.message).toEqual(`Updated '${questionsWithoutCompetencesMock[0].title}' with success`);
       });
     });
     describe('response', () => {
@@ -747,7 +760,7 @@ describe('Question Routes - sanitization and validation body errors', () => {
         const response = await request(app).put('/questions/123').send(payload);
   
         expect(response.status).toBe(200);
-        expect(response.body.message).toEqual(`Updated '${questionsMock[0].title}' with success`);
+        expect(response.body.message).toEqual(`Updated '${questionsWithoutCompetencesMock[0].title}' with success`);
       });
     });
   });
@@ -755,7 +768,7 @@ describe('Question Routes - sanitization and validation body errors', () => {
   describe('POST /questions', () => {
     beforeEach(() => {
       const mockSaveQuestion = jest.spyOn(new QuestionModel(), 'save')
-      mockSaveQuestion.mockImplementation(jest.fn().mockReturnValueOnce(questionsMock[0]));
+      mockSaveQuestion.mockImplementation(jest.fn().mockReturnValueOnce(questionsWithoutCompetencesMock[0]));
     });
     it('create a question with empty payload and API return error', async () => {
       const payload = {}
@@ -780,7 +793,7 @@ describe('Question Routes - sanitization and validation body errors', () => {
       const response = await request(app).post('/questions').send(payload);
   
       expect(response.status).toBe(201);
-      expect(response.body).toEqual({ message: `Created '${questionsMock[0].title}' with success` });
+      expect(response.body).toEqual({ message: `Created '${questionsWithoutCompetencesMock[0].title}' with success` });
     })
   
     it('create a question and sanitization body and API return success', async () => {
@@ -794,7 +807,7 @@ describe('Question Routes - sanitization and validation body errors', () => {
       const response = await request(app).post('/questions').send(payload);
   
       expect(response.status).toBe(201);
-      expect(response.body.message).toEqual(`Created '${questionsMock[0].title}' with success`);
+      expect(response.body.message).toEqual(`Created '${questionsWithoutCompetencesMock[0].title}' with success`);
   
       expect(response.body.message).not.toContain(questionErrorMessages.titleEmpty);
       expect(response.body.message).not.toContain(questionErrorMessages.statementEmpty);
@@ -901,7 +914,7 @@ describe('Question Routes - sanitization and validation body errors', () => {
         const response = await request(app).post('/questions').send(payload);
   
         expect(response.status).toBe(201);
-        expect(response.body.message).toEqual(`Created '${questionsMock[0].title}' with success`);
+        expect(response.body.message).toEqual(`Created '${questionsWithoutCompetencesMock[0].title}' with success`);
       });
   
       it('renders success when add a title with max length', async () => {
@@ -915,7 +928,7 @@ describe('Question Routes - sanitization and validation body errors', () => {
         const response = await request(app).post('/questions').send(payload);
   
         expect(response.status).toBe(201);
-        expect(response.body.message).toEqual(`Created '${questionsMock[0].title}' with success`);
+        expect(response.body.message).toEqual(`Created '${questionsWithoutCompetencesMock[0].title}' with success`);
       });
     });
   
@@ -1075,7 +1088,7 @@ describe('Question Routes - sanitization and validation body errors', () => {
         const response = await request(app).post('/questions').send(payload);
   
         expect(response.status).toBe(201);
-        expect(response.body.message).toEqual(`Created '${questionsMock[0].title}' with success`);
+        expect(response.body.message).toEqual(`Created '${questionsWithoutCompetencesMock[0].title}' with success`);
       });
   
       it('renders success when add a type with max length', async () => {
@@ -1089,7 +1102,7 @@ describe('Question Routes - sanitization and validation body errors', () => {
         const response = await request(app).post('/questions').send(payload);
   
         expect(response.status).toBe(201);
-        expect(response.body.message).toEqual(`Created '${questionsMock[0].title}' with success`);
+        expect(response.body.message).toEqual(`Created '${questionsWithoutCompetencesMock[0].title}' with success`);
       });
     });
   
@@ -1176,7 +1189,7 @@ describe('Question Routes - sanitization and validation body errors', () => {
         const response = await request(app).post('/questions').send(payload);
   
         expect(response.status).toBe(201);
-        expect(response.body.message).toEqual(`Created '${questionsMock[0].title}' with success`);
+        expect(response.body.message).toEqual(`Created '${questionsWithoutCompetencesMock[0].title}' with success`);
       });
     });
   
@@ -1209,7 +1222,7 @@ describe('Question Routes - sanitization and validation body errors', () => {
         const response = await request(app).post('/questions').send(payload);
   
         expect(response.status).toBe(201);
-        expect(response.body.message).toEqual(`Created '${questionsMock[0].title}' with success`);
+        expect(response.body.message).toEqual(`Created '${questionsWithoutCompetencesMock[0].title}' with success`);
       });
   
       it('renders success when add valid font', async () => {
@@ -1224,7 +1237,7 @@ describe('Question Routes - sanitization and validation body errors', () => {
         const response = await request(app).post('/questions').send(payload);
   
         expect(response.status).toBe(201);
-        expect(response.body.message).toEqual(`Created '${questionsMock[0].title}' with success`);
+        expect(response.body.message).toEqual(`Created '${questionsWithoutCompetencesMock[0].title}' with success`);
       });
     });
   
@@ -1257,7 +1270,7 @@ describe('Question Routes - sanitization and validation body errors', () => {
         const response = await request(app).post('/questions').send(payload);
   
         expect(response.status).toBe(201);
-        expect(response.body.message).toEqual(`Created '${questionsMock[0].title}' with success`);
+        expect(response.body.message).toEqual(`Created '${questionsWithoutCompetencesMock[0].title}' with success`);
       });
     });
     describe('response', () => {
@@ -1344,7 +1357,7 @@ describe('Question Routes - sanitization and validation body errors', () => {
         const response = await request(app).post('/questions').send(payload);
   
         expect(response.status).toBe(201);
-        expect(response.body.message).toEqual(`Created '${questionsMock[0].title}' with success`);
+        expect(response.body.message).toEqual(`Created '${questionsWithoutCompetencesMock[0].title}' with success`);
       });
     });
   });
