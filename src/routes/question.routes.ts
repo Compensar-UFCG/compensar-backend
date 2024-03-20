@@ -1,14 +1,29 @@
 import { Router, Request, Response } from 'express';
 import Question from '../models/question.model';
+import CompetenceQuestion from '../models/competenceQuestion.model';
+
 import { getErrorObject } from '../utils/error';
 import { checkIsValidQuestionBody, questionValidationSchema, sanitizationQuestionBody } from '../utils/questions.validation';
 
 const router: Router = Router();
 
+export const getObject = (question: any) => question.toObject();
+
 router.get('/questions', async (_: Request, res: Response) => {
   try {
     const questions = await Question.find();
-    res.status(200).json(questions);
+
+    const questionsAndCompetences = await Promise.all(questions.map(async question => {
+      const competenceQuestion = await CompetenceQuestion.find({ question: question._id }).populate('competence');
+      const competences = competenceQuestion.map(({ competence }) => competence);
+      
+      return {
+        ...getObject(question),
+        competences,
+      };
+    }));
+
+    res.status(200).json(questionsAndCompetences);
   } catch (err) {
     const error = getErrorObject(err);
     res.status(error.status).json(error);
@@ -23,7 +38,13 @@ router.get('/questions/:id', async (req: Request, res: Response) => {
     if (!question) {
       return res.status(404).json({ message: 'Question not found' });
     }
-    res.status(200).json(question);
+    const competenceQuestion = await CompetenceQuestion.find({ question: id }).populate('competence');
+    const competences = competenceQuestion.map(({ competence }) => competence);
+    const questionAndCompetences = {
+      ...getObject(question),
+      competences,
+    };
+    res.status(200).json(questionAndCompetences);
   } catch (err) {
     const error = getErrorObject(err);
     res.status(error.status).json(error);
