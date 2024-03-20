@@ -7,6 +7,7 @@ import { checkIsValidQuestionBody, questionValidationSchema, sanitizationQuestio
 
 const router: Router = Router();
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const getObject = (question: any) => question.toObject();
 
 router.get('/questions', async (_: Request, res: Response) => {
