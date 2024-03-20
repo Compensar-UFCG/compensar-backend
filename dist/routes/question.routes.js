@@ -12,15 +12,25 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.getObject = void 0;
 const express_1 = require("express");
 const question_model_1 = __importDefault(require("../models/question.model"));
+const competenceQuestion_model_1 = __importDefault(require("../models/competenceQuestion.model"));
 const error_1 = require("../utils/error");
 const questions_validation_1 = require("../utils/questions.validation");
 const router = (0, express_1.Router)();
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const getObject = (question) => question.toObject();
+exports.getObject = getObject;
 router.get('/questions', (_, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const questions = yield question_model_1.default.find();
-        res.status(200).json(questions);
+        const questionsAndCompetences = yield Promise.all(questions.map((question) => __awaiter(void 0, void 0, void 0, function* () {
+            const competenceQuestion = yield competenceQuestion_model_1.default.find({ question: question._id }).populate('competence');
+            const competences = competenceQuestion.map(({ competence }) => competence);
+            return Object.assign(Object.assign({}, (0, exports.getObject)(question)), { competences });
+        })));
+        res.status(200).json(questionsAndCompetences);
     }
     catch (err) {
         const error = (0, error_1.getErrorObject)(err);
@@ -34,7 +44,10 @@ router.get('/questions/:id', (req, res) => __awaiter(void 0, void 0, void 0, fun
         if (!question) {
             return res.status(404).json({ message: 'Question not found' });
         }
-        res.status(200).json(question);
+        const competenceQuestion = yield competenceQuestion_model_1.default.find({ question: id }).populate('competence');
+        const competences = competenceQuestion.map(({ competence }) => competence);
+        const questionAndCompetences = Object.assign(Object.assign({}, (0, exports.getObject)(question)), { competences });
+        res.status(200).json(questionAndCompetences);
     }
     catch (err) {
         const error = (0, error_1.getErrorObject)(err);
