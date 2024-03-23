@@ -3,10 +3,11 @@ import User from '../models/user.model';
 import { checkIsValidUserBody, sanitizationUserBody, userValidationSchema } from '../utils/users.validation';
 import { getErrorObject } from '../utils/error';
 import { hashPassword } from '../utils/securityData';
+import authenticateToken from '../middlewares/authenticator';
 
 const router: Router = Router();
 
-router.get('/users', async (_: Request, res: Response) => {
+router.get('/users', authenticateToken, async (_: Request, res: Response) => {
   try {
     const users = await User.find({}, { password: 0 });
     res.status(200).json(users);
@@ -16,8 +17,12 @@ router.get('/users', async (_: Request, res: Response) => {
   }
 });
 
-router.get('/users/:id', async (req: Request, res: Response) => {
+router.get('/users/:id', authenticateToken, async (req: Request, res: Response) => {
   const id = req.params.id;
+
+  if (id !== req.user?.id) {
+    return res.status(403).json({ message: 'Você não tem permissão para acessar estas informações.' });
+  }
 
   try {
     const user = await User.findById(id, { password: 0 });
@@ -60,12 +65,17 @@ router.post('/users', sanitizationUserBody, userValidationSchema, async (req: Re
   }
 });
 
-router.put('/users/:id', sanitizationUserBody, userValidationSchema, async (req: Request, res: Response) => {
+router.put('/users/:id', authenticateToken, sanitizationUserBody, userValidationSchema, async (req: Request, res: Response) => {
+  const id = req.params.id;
+
+  if (id !== req.user?.id) {
+    return res.status(403).json({ message: 'Você não tem permissão para alterar estas informações.' });
+  }
+
   const { isError, message } = checkIsValidUserBody(req);
 
   if(isError) return res.status(422).json({ message })
 
-  const id = req.params.id;
   const { name, username, email, password } = req.body;
 
   try {
@@ -85,9 +95,12 @@ router.put('/users/:id', sanitizationUserBody, userValidationSchema, async (req:
   }
 });
 
-router.delete('/users/:id', async (req: Request, res: Response) => {
+router.delete('/users/:id', authenticateToken, async (req: Request, res: Response) => {
   const id = req.params.id;
-
+  
+  if (id !== req.user?.id) {
+    return res.status(403).json({ message: 'Você não tem permissão para excluir estas informações.' });
+  }
   try {
     const user = await User.findByIdAndDelete(id);
     if (!user) {
