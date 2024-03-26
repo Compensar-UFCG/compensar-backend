@@ -23,12 +23,11 @@ router.post('/login', async (req: Request, res: Response) => {
     if (isMatch) {
       const token = jwt.sign({ id: user.id }, process.env.PRIVATE_KEY || "", { expiresIn: '24h' });
       return res.status(200).json({ token });
-    } else {
+    } else
       return res.status(401).json({ message: 'Credenciais inválidas' });
-    }
   } catch (err) {
     const error = getErrorObject(err);
-    res.status(error.status).json(error);
+    return res.status(error.status).json(error);
   }
 });
 
