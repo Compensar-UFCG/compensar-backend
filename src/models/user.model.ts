@@ -2,8 +2,8 @@ import { Schema, model } from 'mongoose';
 
 import { UUID } from 'crypto';
 
-interface User {
-  id: UUID;
+export interface User {
+  id: UUID | string;
   name?: string;
   username: string;
   email: string;

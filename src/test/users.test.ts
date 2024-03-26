@@ -4,6 +4,8 @@ import usersMock from "./mocks/usersMock.json";
 import express from 'express';
 import UserModel from '../models/user.model';
 import bodyParser from 'body-parser';
+import jwt from 'jsonwebtoken';
+
 import { userErrorMessages } from '../utils/users.validation';
 
 const app = express();
@@ -13,6 +15,9 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(router);
 
 jest.mock('../models/user.model');
+jest.mock('jsonwebtoken');
+
+const tokenMock = 'TOKEN_MOCK';
 
 const payload = {...usersMock[0], password: "#Aa12345" }
 describe('User Routes - API requests success and erros', () => {
@@ -21,11 +26,14 @@ describe('User Routes - API requests success and erros', () => {
     UserModel.findById = jest.fn().mockReturnValueOnce(usersMock[0]);
     UserModel.findByIdAndUpdate = jest.fn().mockReturnValueOnce(usersMock[0]);
     UserModel.findByIdAndDelete = jest.fn().mockReturnValueOnce(usersMock[0]);
+    jwt.verify = jest.fn().mockImplementation((token, key, callback) => {
+      callback(null, usersMock[0]);
+    });
   });
 
   describe('GET /users', () => {
-    it('responds with json array of users', async () => {
-      const response = await request(app).get('/users');
+    it('responds with 200 and json array of users', async () => {
+      const response = await request(app).get('/users').set('Authorization', `Bearer ${tokenMock}`);
 
       expect(response.status).toBe(200);
       expect(response.body).toEqual(usersMock);
@@ -34,7 +42,7 @@ describe('User Routes - API requests success and erros', () => {
     it('responds with 500 status if an error occurs', async () => {
       UserModel.find = jest.fn().mockRejectedValue(new Error('Internal Server Error'));
 
-      const response = await request(app).get('/users');
+      const response = await request(app).get('/users').set('Authorization', `Bearer ${tokenMock}`);
 
       expect(response.status).toBe(500);
       expect(response.body).toMatchObject({ message: 'Internal Server Error' });
@@ -43,7 +51,7 @@ describe('User Routes - API requests success and erros', () => {
     it('responds with 500 status and default error message when no pass a error message', async () => {
       UserModel.find = jest.fn().mockRejectedValue(new Error());
 
-      const response = await request(app).get('/users');
+      const response = await request(app).get('/users').set('Authorization', `Bearer ${tokenMock}`);
 
       expect(response.status).toBe(500);
       expect(response.body).toMatchObject({ message: 'Interner Server Error' });
@@ -51,26 +59,33 @@ describe('User Routes - API requests success and erros', () => {
   });
 
   describe('GET /users/:id', () => {
-    it('responds with json user data', async () => {
-      const response = await request(app).get('/users/123');
+    it('responds with 200 and json user data', async () => {
+      const response = await request(app).get(`/users/${usersMock[0].id}`).set('Authorization', `Bearer ${tokenMock}`);
 
       expect(response.status).toBe(200);
       expect(response.body).toEqual(usersMock[0]);
     });
 
+    it('responds with 403 when user is not authorized', async () => {
+      const response = await request(app).get(`/users/${usersMock[1].id}`).set('Authorization', `Bearer ${tokenMock}`);
+
+      expect(response.status).toBe(403);
+      expect(response.body).toMatchObject({ message: 'You do not have permission to access this information.' });
+    });
+
     it('responds with 404 status if user not found', async () => {
       UserModel.findById = jest.fn().mockReturnValueOnce(undefined);
 
-      const response = await request(app).get('/users/nonexistent_id');
+      const response = await request(app).get(`/users/${usersMock[0].id}`).set('Authorization', `Bearer ${tokenMock}`);
 
       expect(response.status).toBe(404);
-      expect(response.body).toEqual({ message: 'User not found' });
+      expect(response.body).toMatchObject({ message: 'User not found' });
     });
 
     it('responds with 500 status if an error occurs', async () => {
       UserModel.findById = jest.fn().mockRejectedValue(new Error('Internal Server Error'));
 
-      const response = await request(app).get('/users/123');
+      const response = await request(app).get(`/users/${usersMock[0].id}`).set('Authorization', `Bearer ${tokenMock}`);
 
       expect(response.status).toBe(500);
       expect(response.body).toMatchObject({ message: 'Internal Server Error' });
@@ -121,16 +136,32 @@ describe('User Routes - API requests success and erros', () => {
   });
   describe('PUT /users/:id', () => {
     it('responds with json user data', async () => {
-      const response = await request(app).put('/users/123').send(payload);
+      const response = await request(app)
+        .put(`/users/${usersMock[0].id}`)
+        .set('Authorization', `Bearer ${tokenMock}`)
+        .send(payload);
 
       expect(response.status).toBe(200);
       expect(response.body).toEqual({ message: `Updated '${payload.username}' with success` });
     });
 
+    it('responds with 403 when user is not authorized', async () => {
+      const response = await request(app)
+        .put(`/users/${usersMock[1].id}`)
+        .set('Authorization', `Bearer ${tokenMock}`)
+        .send(payload);
+
+      expect(response.status).toBe(403);
+      expect(response.body).toMatchObject({ message: 'You do not have permission to modify this information.' });
+    });
+
     it('responds with 404 status if user not found', async () => {
       UserModel.findByIdAndUpdate = jest.fn().mockReturnValueOnce(undefined);
 
-      const response = await request(app).put('/users/nonexistent_id').send(payload);
+      const response = await request(app)
+        .put(`/users/${usersMock[0].id}`)
+        .set('Authorization', `Bearer ${tokenMock}`)
+        .send(payload);
 
       expect(response.status).toBe(404);
       expect(response.body).toEqual({ message: 'User not found' });
@@ -139,7 +170,10 @@ describe('User Routes - API requests success and erros', () => {
     it('responds with 500 status if an error occurs', async () => {
       UserModel.findByIdAndUpdate = jest.fn().mockRejectedValue(new Error('Internal Server Error'));
 
-      const response = await request(app).put('/users/123').send(payload);
+      const response = await request(app)
+        .put(`/users/${usersMock[0].id}`)
+        .set('Authorization', `Bearer ${tokenMock}`)
+        .send(payload);
 
       expect(response.status).toBe(500);
       expect(response.body).toMatchObject({ message: 'Internal Server Error' });
@@ -148,7 +182,10 @@ describe('User Routes - API requests success and erros', () => {
     it('responds with exist user account with this email', async () => {
       UserModel.findByIdAndUpdate = jest.fn().mockRejectedValue({ message: `E11000 duplicate key error collection: test.users index: username_1 dup key`, keyValue: { email: payload.email}});
 
-      const response = await request(app).put('/users/123').send(payload);
+      const response = await request(app)
+        .put(`/users/${usersMock[0].id}`)
+        .set('Authorization', `Bearer ${tokenMock}`)
+        .send(payload);
 
       expect(response.status).toBe(409);
       expect(response.body).toEqual({ message: `Exist user with: ${payload.email}` });
@@ -157,7 +194,10 @@ describe('User Routes - API requests success and erros', () => {
     it('responds with exist user account with this username', async () => {
       UserModel.findByIdAndUpdate = jest.fn().mockRejectedValue({ message: `E11000 duplicate key error collection: test.users index: username_1 dup key`, keyValue: { username: payload.username}});
 
-      const response = await request(app).put('/users/123').send(payload);
+      const response = await request(app)
+        .put(`/users/${usersMock[0].id}`)
+        .set('Authorization', `Bearer ${tokenMock}`)
+        .send(payload);
 
       expect(response.status).toBe(409);
       expect(response.body).toEqual({ message: `Exist user with: ${payload.username}` });
@@ -165,17 +205,24 @@ describe('User Routes - API requests success and erros', () => {
   });
 
   describe('DELETE /users/:id', () => {
-    it('responds with json user data', async () => {
-      const response = await request(app).delete('/users/123');
+    it('responds with 200 and json user data', async () => {
+      const response = await request(app).delete(`/users/${usersMock[0].id}`).set('Authorization', `Bearer ${tokenMock}`);
 
       expect(response.status).toBe(200);
       expect(response.body).toEqual({ message: `Delete user '${usersMock[0].username}' with success`});
     }, 12);
 
+    it('responds with 403 when user is not authorized', async () => {
+      const response = await request(app).delete(`/users/${usersMock[1].id}`).set('Authorization', `Bearer ${tokenMock}`);
+
+      expect(response.status).toBe(403);
+      expect(response.body).toMatchObject({ message: 'You do not have permission to delete this information.' });
+    });
+
     it('responds with 404 status if user not found', async () => {
       UserModel.findByIdAndDelete = jest.fn().mockReturnValueOnce(undefined);
 
-      const response = await request(app).delete('/users/nonexistent_id');
+      const response = await request(app).delete(`/users/${usersMock[0].id}`).set('Authorization', `Bearer ${tokenMock}`);
 
       expect(response.status).toBe(404);
       expect(response.body).toEqual({ message: 'User not found' });
@@ -184,7 +231,7 @@ describe('User Routes - API requests success and erros', () => {
     it('responds with 500 status if an error occurs', async () => {
       UserModel.findByIdAndDelete = jest.fn().mockRejectedValue(new Error('Internal Server Error'));
 
-      const response = await request(app).delete('/users/123');
+      const response = await request(app).delete(`/users/${usersMock[0].id}`).set('Authorization', `Bearer ${tokenMock}`);
 
       expect(response.status).toBe(500);
       expect(response.body).toMatchObject({ message: 'Internal Server Error' });
@@ -196,10 +243,16 @@ describe('User Routes - sanitization and validation body errors', () => {
   describe('PUT /users/:id', () => {
     beforeEach(() => {
       UserModel.findByIdAndUpdate = jest.fn().mockReturnValueOnce(usersMock[0]);
+      jwt.verify = jest.fn().mockImplementation((token, key, callback) => {
+        callback(null, usersMock[0]);
+      });
     });
     it('update a user with empty payload and API return error', async () => {
       const payload = {}
-      const response = await request(app).put('/users/123').send(payload);
+      const response = await request(app)
+        .put(`/users/${usersMock[0].id}`)
+        .set('Authorization', `Bearer ${tokenMock}`)
+        .send(payload);
       
       expect(response.status).toBe(422);
       expect(response.body.message).toContain(userErrorMessages.usernameEmpty);
@@ -218,7 +271,10 @@ describe('User Routes - sanitization and validation body errors', () => {
         email: "email.test@gmail.com",
         password: "#Aa12345"
       }
-      const response = await request(app).put('/users/123').send(payload);
+      const response = await request(app)
+        .put(`/users/${usersMock[0].id}`)
+        .set('Authorization', `Bearer ${tokenMock}`)
+        .send(payload);
 
       expect(response.status).toBe(200);
       expect(response.body).toEqual({ message: `Updated '${payload.username}' with success` });
@@ -231,7 +287,10 @@ describe('User Routes - sanitization and validation body errors', () => {
         email: " email.test@gmail.com ",
         password: " #Aa12345 "
       }
-      const response = await request(app).put('/users/123').send(payload);
+      const response = await request(app)
+        .put(`/users/${usersMock[0].id}`)
+        .set('Authorization', `Bearer ${tokenMock}`)
+        .send(payload);
 
       expect(response.status).toBe(200);
       expect(response.body.message).toEqual(`Updated '${usersMock[0].username}' with success`)
@@ -244,7 +303,7 @@ describe('User Routes - sanitization and validation body errors', () => {
       expect(response.body.message).not.toContain(userErrorMessages.passwordEmpty);
       expect(response.body.message).not.toContain(userErrorMessages.passwordLength);
       expect(response.body.message).not.toContain(userErrorMessages.passwordInvalid);
-    });
+    }, 5000);
 
     describe('username rules', () => {
       it('update a user without username and API return error', async () => {
@@ -253,7 +312,10 @@ describe('User Routes - sanitization and validation body errors', () => {
           email: "email.test@gmail.com",
           password: "#Aa12345"
         }
-        const response = await request(app).put('/users/123').send(payload);
+        const response = await request(app)
+          .put(`/users/${usersMock[0].id}`)
+          .set('Authorization', `Bearer ${tokenMock}`)
+          .send(payload);
         expect(response.status).toBe(422);
         expect(response.body.message).toContain(userErrorMessages.usernameEmpty);
         expect(response.body.message).toContain(userErrorMessages.usernameLength);
@@ -271,7 +333,10 @@ describe('User Routes - sanitization and validation body errors', () => {
           email: "email.test@gmail.com",
           password: "#Aa12345"
         }
-        const response = await request(app).put('/users/123').send(payload);
+        const response = await request(app)
+          .put(`/users/${usersMock[0].id}`)
+          .set('Authorization', `Bearer ${tokenMock}`)
+          .send(payload);
   
         expect(response.status).toBe(422);
         expect(response.body.message).toContain(userErrorMessages.usernameEmpty);
@@ -291,7 +356,10 @@ describe('User Routes - sanitization and validation body errors', () => {
           email: "email.test@gmail.com",
           password: "#Aa12345"
         }
-        const response = await request(app).put('/users/123').send(payload);
+        const response = await request(app)
+          .put(`/users/${usersMock[0].id}`)
+          .set('Authorization', `Bearer ${tokenMock}`)
+          .send(payload);
   
         expect(response.status).toBe(422);
         expect(response.body.message).toContain(userErrorMessages.usernameEmpty);
@@ -310,7 +378,10 @@ describe('User Routes - sanitization and validation body errors', () => {
           email: "email.test@gmail.com",
           password: "#Aa12345"
         }
-        const response = await request(app).put('/users/123').send(payload);
+        const response = await request(app)
+          .put(`/users/${usersMock[0].id}`)
+          .set('Authorization', `Bearer ${tokenMock}`)
+          .send(payload);
   
         expect(response.status).toBe(422);
         expect(response.body.message).not.toContain(userErrorMessages.usernameEmpty);
@@ -330,7 +401,10 @@ describe('User Routes - sanitization and validation body errors', () => {
           email: "email.test@gmail.com",
           password: "#Aa12345"
         }
-        const response = await request(app).put('/users/123').send(payload);
+        const response = await request(app)
+          .put(`/users/${usersMock[0].id}`)
+          .set('Authorization', `Bearer ${tokenMock}`)
+          .send(payload);
   
         expect(response.status).toBe(200);
         expect(response.body.message).toEqual(`Updated '${usersMock[0].username}' with success`)
@@ -352,7 +426,10 @@ describe('User Routes - sanitization and validation body errors', () => {
           email: "email.test@gmail.com",
           password: "#Aa12345"
         }
-        const response = await request(app).put('/users/123').send(payload);
+        const response = await request(app)
+          .put(`/users/${usersMock[0].id}`)
+          .set('Authorization', `Bearer ${tokenMock}`)
+          .send(payload);
   
         expect(response.status).toBe(422);
         expect(response.body.message).not.toContain(userErrorMessages.usernameEmpty);
@@ -372,7 +449,10 @@ describe('User Routes - sanitization and validation body errors', () => {
           email: "email.test@gmail.com",
           password: "#Aa12345"
         }
-        const response = await request(app).put('/users/123').send(payload);
+        const response = await request(app)
+          .put(`/users/${usersMock[0].id}`)
+          .set('Authorization', `Bearer ${tokenMock}`)
+          .send(payload);
   
         expect(response.status).toBe(200);
         expect(response.body.message).toEqual(`Updated '${usersMock[0].username}' with success`)
@@ -394,7 +474,10 @@ describe('User Routes - sanitization and validation body errors', () => {
           email: "email.test@gmail.com",
           password: "#Aa12345"
         }
-        const response = await request(app).put('/users/123').send(payload);
+        const response = await request(app)
+          .put(`/users/${usersMock[0].id}`)
+          .set('Authorization', `Bearer ${tokenMock}`)
+          .send(payload);
   
         expect(response.status).toBe(422);
         expect(response.body.message).not.toContain(userErrorMessages.usernameEmpty);
@@ -415,7 +498,10 @@ describe('User Routes - sanitization and validation body errors', () => {
           username: "test.username",
           password: "#Aa12345"
         }
-        const response = await request(app).put('/users/123').send(payload);
+        const response = await request(app)
+          .put(`/users/${usersMock[0].id}`)
+          .set('Authorization', `Bearer ${tokenMock}`)
+          .send(payload);
   
         expect(response.status).toBe(422);
         expect(response.body.message).not.toContain(userErrorMessages.usernameEmpty);
@@ -435,7 +521,10 @@ describe('User Routes - sanitization and validation body errors', () => {
           email: "",
           password: "#Aa12345"
         }
-        const response = await request(app).put('/users/123').send(payload);
+        const response = await request(app)
+          .put(`/users/${usersMock[0].id}`)
+          .set('Authorization', `Bearer ${tokenMock}`)
+          .send(payload);
   
         expect(response.status).toBe(422);
         expect(response.body.message).not.toContain(userErrorMessages.usernameEmpty);
@@ -455,7 +544,10 @@ describe('User Routes - sanitization and validation body errors', () => {
           email: "  ",
           password: "#Aa12345"
         }
-        const response = await request(app).put('/users/123').send(payload);
+        const response = await request(app)
+          .put(`/users/${usersMock[0].id}`)
+          .set('Authorization', `Bearer ${tokenMock}`)
+          .send(payload);
   
         expect(response.status).toBe(422);
         expect(response.body.message).not.toContain(userErrorMessages.usernameEmpty);
@@ -475,7 +567,10 @@ describe('User Routes - sanitization and validation body errors', () => {
           email: "test",
           password: "#Aa12345"
         }
-        const response = await request(app).put('/users/123').send(payload);
+        const response = await request(app)
+          .put(`/users/${usersMock[0].id}`)
+          .set('Authorization', `Bearer ${tokenMock}`)
+          .send(payload);
   
         expect(response.status).toBe(422);
         expect(response.body.message).not.toContain(userErrorMessages.usernameEmpty);
@@ -495,7 +590,10 @@ describe('User Routes - sanitization and validation body errors', () => {
           email: "test@",
           password: "#Aa12345"
         }
-        const response = await request(app).put('/users/123').send(payload);
+        const response = await request(app)
+          .put(`/users/${usersMock[0].id}`)
+          .set('Authorization', `Bearer ${tokenMock}`)
+          .send(payload);
   
         expect(response.status).toBe(422);
         expect(response.body.message).not.toContain(userErrorMessages.usernameEmpty);
@@ -515,7 +613,10 @@ describe('User Routes - sanitization and validation body errors', () => {
           email: "@test.com",
           password: "#Aa12345"
         }
-        const response = await request(app).put('/users/123').send(payload);
+        const response = await request(app)
+          .put(`/users/${usersMock[0].id}`)
+          .set('Authorization', `Bearer ${tokenMock}`)
+          .send(payload);
   
         expect(response.status).toBe(422);
         expect(response.body.message).not.toContain(userErrorMessages.usernameEmpty);
@@ -535,7 +636,10 @@ describe('User Routes - sanitization and validation body errors', () => {
           email: "test@test.",
           password: "#Aa12345"
         }
-        const response = await request(app).put('/users/123').send(payload);
+        const response = await request(app)
+          .put(`/users/${usersMock[0].id}`)
+          .set('Authorization', `Bearer ${tokenMock}`)
+          .send(payload);
   
         expect(response.status).toBe(422);
         expect(response.body.message).not.toContain(userErrorMessages.usernameEmpty);
@@ -556,7 +660,10 @@ describe('User Routes - sanitization and validation body errors', () => {
           username: "test.username",
           email: "email.test@gmail.com",
         }
-        const response = await request(app).put('/users/123').send(payload);
+        const response = await request(app)
+          .put(`/users/${usersMock[0].id}`)
+          .set('Authorization', `Bearer ${tokenMock}`)
+          .send(payload);
   
         expect(response.status).toBe(422);
         expect(response.body.message).not.toContain(userErrorMessages.usernameEmpty);
@@ -575,7 +682,10 @@ describe('User Routes - sanitization and validation body errors', () => {
           email: "email.test@gmail.com",
           password: ""
         }
-        const response = await request(app).put('/users/123').send(payload);
+        const response = await request(app)
+          .put(`/users/${usersMock[0].id}`)
+          .set('Authorization', `Bearer ${tokenMock}`)
+          .send(payload);
   
         expect(response.status).toBe(422);
         expect(response.body.message).not.toContain(userErrorMessages.usernameEmpty);
@@ -595,7 +705,10 @@ describe('User Routes - sanitization and validation body errors', () => {
           email: "email.test@gmail.com",
           password: "  "
         }
-        const response = await request(app).put('/users/123').send(payload);
+        const response = await request(app)
+          .put(`/users/${usersMock[0].id}`)
+          .set('Authorization', `Bearer ${tokenMock}`)
+          .send(payload);
   
         expect(response.status).toBe(422);
         expect(response.body.message).not.toContain(userErrorMessages.usernameEmpty);
@@ -615,7 +728,10 @@ describe('User Routes - sanitization and validation body errors', () => {
           email: "email.test@gmail.com",
           password: "$S12345"
         }
-        const response = await request(app).put('/users/123').send(payload);
+        const response = await request(app)
+          .put(`/users/${usersMock[0].id}`)
+          .set('Authorization', `Bearer ${tokenMock}`)
+          .send(payload);
   
         expect(response.status).toBe(422);
         expect(response.body.message).not.toContain(userErrorMessages.usernameEmpty);
@@ -635,7 +751,10 @@ describe('User Routes - sanitization and validation body errors', () => {
           email: "email.test@gmail.com",
           password: "$S12345688910"
         }
-        const response = await request(app).put('/users/123').send(payload);
+        const response = await request(app)
+          .put(`/users/${usersMock[0].id}`)
+          .set('Authorization', `Bearer ${tokenMock}`)
+          .send(payload);
   
         expect(response.status).toBe(422);
         expect(response.body.message).not.toContain(userErrorMessages.usernameEmpty);
@@ -655,7 +774,10 @@ describe('User Routes - sanitization and validation body errors', () => {
           email: "email.test@gmail.com",
           password: "$1234567"
         }
-        const response = await request(app).put('/users/123').send(payload);
+        const response = await request(app)
+          .put(`/users/${usersMock[0].id}`)
+          .set('Authorization', `Bearer ${tokenMock}`)
+          .send(payload);
   
         expect(response.status).toBe(422);
         expect(response.body.message).not.toContain(userErrorMessages.usernameEmpty);
@@ -675,7 +797,10 @@ describe('User Routes - sanitization and validation body errors', () => {
           email: "email.test@gmail.com",
           password: "$abcdefg1"
         }
-        const response = await request(app).put('/users/123').send(payload);
+        const response = await request(app)
+          .put(`/users/${usersMock[0].id}`)
+          .set('Authorization', `Bearer ${tokenMock}`)
+          .send(payload);
   
         expect(response.status).toBe(422);
         expect(response.body.message).not.toContain(userErrorMessages.usernameEmpty);
@@ -695,7 +820,10 @@ describe('User Routes - sanitization and validation body errors', () => {
           email: "email.test@gmail.com",
           password: "$abcdefg"
         }
-        const response = await request(app).put('/users/123').send(payload);
+        const response = await request(app)
+          .put(`/users/${usersMock[0].id}`)
+          .set('Authorization', `Bearer ${tokenMock}`)
+          .send(payload);
   
         expect(response.status).toBe(422);
         expect(response.body.message).not.toContain(userErrorMessages.usernameEmpty);
@@ -715,7 +843,10 @@ describe('User Routes - sanitization and validation body errors', () => {
           email: "email.test@gmail.com",
           password: "abcdefg1"
         }
-        const response = await request(app).put('/users/123').send(payload);
+        const response = await request(app)
+          .put(`/users/${usersMock[0].id}`)
+          .set('Authorization', `Bearer ${tokenMock}`)
+          .send(payload);
   
         expect(response.status).toBe(422);
         expect(response.body.message).not.toContain(userErrorMessages.usernameEmpty);
@@ -1268,5 +1399,89 @@ describe('User Routes - sanitization and validation body errors', () => {
       });
     })
   
+  });
+});
+
+describe('User Routes -  authentication', () => {
+
+  describe('GET /users', () => {
+    it('responds with 401 when not add token', async () => {
+      const response = await request(app).get('/users');
+
+      expect(response.status).toBe(401);
+      expect(response.body).toMatchObject({ message: 'Authentication token not provided.'});
+    });
+
+    it('responds with 498 when token is invalid', async () => {
+      jwt.verify = jest.fn().mockImplementation((token, key, callback) => {
+        callback('Erro de verificação do token', null);
+      });
+
+      const response = await request(app).get('/users').set('Authorization', `Bearer ${tokenMock}`);
+
+      expect(response.status).toBe(498);
+      expect(response.body).toMatchObject({ message: 'Invalid token.'});
+    });
+  });
+  
+  describe('GET /users/:id', () => {
+    it('responds with 401 when not add token', async () => {
+      const response = await request(app).get(`/users/${usersMock[0].id}`);
+
+      expect(response.status).toBe(401);
+      expect(response.body).toMatchObject({ message: 'Authentication token not provided.'});
+    });
+
+    it('responds with 498 when token is invalid', async () => {
+      jwt.verify = jest.fn().mockImplementation((token, key, callback) => {
+        callback('Erro de verificação do token', null);
+      });
+      
+      const response = await request(app).get(`/users/${usersMock[0].id}`).set('Authorization', `Bearer ${tokenMock}`);
+
+      expect(response.status).toBe(498);
+      expect(response.body).toMatchObject({ message: 'Invalid token.'});
+    });
+  });
+  describe('PUT /users/:id', () => {
+    it('responds with 401 when not add token', async () => {
+      const response = await request(app).put(`/users/${usersMock[0].id}`).send(payload);
+
+      expect(response.status).toBe(401);
+      expect(response.body).toMatchObject({ message: 'Authentication token not provided.'});
+    });
+
+    it('responds with 498 when token is invalid', async () => {
+      jwt.verify = jest.fn().mockImplementation((token, key, callback) => {
+        callback('Erro de verificação do token', null);
+      });
+      
+      const response = await request(app)
+        .put(`/users/${usersMock[0].id}`)
+        .set('Authorization', `Bearer ${tokenMock}`)
+        .send(payload);
+
+      expect(response.status).toBe(498);
+      expect(response.body).toMatchObject({ message: 'Invalid token.'});
+    });
+  });
+  describe('DELETE /users/:id', () => {
+    it('responds with 401 when not add token', async () => {
+      const response = await request(app).delete(`/users/${usersMock[0].id}`);
+
+      expect(response.status).toBe(401);
+      expect(response.body).toMatchObject({ message: 'Authentication token not provided.'});
+    });
+
+    it('responds with 498 when token is invalid', async () => {
+      jwt.verify = jest.fn().mockImplementation((token, key, callback) => {
+        callback('Erro de verificação do token', null);
+      });
+      
+      const response = await request(app).delete(`/users/${usersMock[0].id}`).set('Authorization', `Bearer ${tokenMock}`);
+
+      expect(response.status).toBe(498);
+      expect(response.body).toMatchObject({ message: 'Invalid token.'});
+    });
   });
 });

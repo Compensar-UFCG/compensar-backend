@@ -4,6 +4,7 @@ import usersMock from "./mocks/usersMock.json";
 import express from 'express';
 import UserModel from '../models/user.model';
 import bodyParser from 'body-parser';
+import jwt from 'jsonwebtoken';
 
 const app = express();
 
@@ -12,21 +13,22 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(router);
 
 jest.mock('../models/user.model');
+jest.mock('jsonwebtoken');
 
 const payload = { username: usersMock[0].username, email: usersMock[0].email, password: "#Aa12345" }
 
 describe('Login Routes - API requests success and erros', () => {
-  beforeEach(() => {
-    UserModel.findOne = jest.fn().mockReturnValueOnce(usersMock[0]);
-  });
-
   describe('POST /login/', () => {
+    beforeEach(() => {
+      UserModel.findOne = jest.fn().mockReturnValueOnce(usersMock[0]);
+      jwt.sign = jest.fn().mockReturnValueOnce('VALID_TOKEN');
+    });
 
     it('responds with success login', async () => {
       const response = await request(app).post('/login').send(payload);
 
       expect(response.status).toBe(200);
-      expect(response.body.message).toEqual('Login bem sucedido');
+      expect(response.body).toMatchObject({ token: 'VALID_TOKEN' });
     });
 
     it('responds with invalid credential when not found user', async () => {

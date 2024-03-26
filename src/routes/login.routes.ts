@@ -3,6 +3,8 @@ import UserModel from '../models/user.model';
 import { compareHash } from '../utils/securityData';
 import { getErrorObject } from '../utils/error';
 
+import jwt from 'jsonwebtoken';
+
 const router: Router = Router();
 
 router.post('/login', async (req: Request, res: Response) => {
@@ -19,13 +21,13 @@ router.post('/login', async (req: Request, res: Response) => {
     
     const isMatch = await compareHash(password, user.password);
     if (isMatch) {
-      return res.status(200).json({ message: 'Login bem sucedido' });
-    } else {
+      const token = jwt.sign({ id: user.id }, process.env.PRIVATE_KEY || "", { expiresIn: '24h' });
+      return res.status(200).json({ token });
+    } else
       return res.status(401).json({ message: 'Credenciais inválidas' });
-    }
   } catch (err) {
     const error = getErrorObject(err);
-    res.status(error.status).json(error);
+    return res.status(error.status).json(error);
   }
 });
 
