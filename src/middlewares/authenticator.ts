@@ -16,17 +16,17 @@ declare global {
 const authenticateToken = (req: Request, res: Response, next: NextFunction) => {
   const token = req.headers.authorization?.split(' ')[1];
 
-  if (!token) {
-    return res.status(401).json({ message: 'Token de autenticação não fornecido' });
-  }
+  if (!token)
+    return res.status(401).json({ message: 'Authentication token not provided.' });
 
-  jwt.verify(token, process.env.PRIVATE_KEY || "", (err, user) => {
+
+  jwt.verify(token, process?.env?.PRIVATE_KEY || "", (err, user) => {
     if (err) {
-      return res.status(403).json({ message: 'Token inválido' });
+      return res.status(498).json({ message: 'Invalid token.' });
+    } else {
+      req.user = user as User;
+      next();
     }
-
-    req.user = user as User;
-    next();
   });
 };
 
