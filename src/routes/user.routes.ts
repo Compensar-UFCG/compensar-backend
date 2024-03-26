@@ -10,29 +10,29 @@ const router: Router = Router();
 router.get('/users', authenticateToken, async (_: Request, res: Response) => {
   try {
     const users = await User.find({}, { password: 0 });
-    res.status(200).json(users);
+    return res.status(200).json(users);
   } catch (err) {
     const error = getErrorObject(err);
-    res.status(error.status).json(error);
+    return res.status(error.status).json(error);
   }
 });
 
 router.get('/users/:id', authenticateToken, async (req: Request, res: Response) => {
   const id = req.params.id;
 
-  if (id !== req.user?.id) {
-    return res.status(403).json({ message: 'Você não tem permissão para acessar estas informações.' });
-  }
+  if (id !== req.user?.id)
+    return res.status(403).json({ message: 'You do not have permission to access this information.' });
+
 
   try {
     const user = await User.findById(id, { password: 0 });
-    if (!user) {
+    if (!user)
       return res.status(404).json({ message: 'User not found' });
-    }
-    res.status(200).json(user);
+    else
+      return res.status(200).json(user);
   } catch (err) {
     const error = getErrorObject(err);
-    res.status(error.status).json(error);
+    return res.status(error.status).json(error);
   }
 });
 
@@ -54,13 +54,13 @@ router.post('/users', sanitizationUserBody, userValidationSchema, async (req: Re
     });
 
     const newUser = await user.save();
-    res.status(201).json({ message: `Created '${newUser.username}' with success`});
+    return res.status(201).json({ message: `Created '${newUser.username}' with success`});
   } catch (err) {
     if(err.message.includes('duplicate key'))
-      res.status(409).json({ message: `Exist user with: ${err.keyValue.email || err.keyValue.username}`})
+      return res.status(409).json({ message: `Exist user with: ${err.keyValue.email || err.keyValue.username}`})
     else {
       const error = getErrorObject(err);
-      res.status(error.status).json(error);
+      return res.status(error.status).json(error);
     }
   }
 });
@@ -69,7 +69,7 @@ router.put('/users/:id', authenticateToken, sanitizationUserBody, userValidation
   const id = req.params.id;
 
   if (id !== req.user?.id) {
-    return res.status(403).json({ message: 'Você não tem permissão para alterar estas informações.' });
+    return res.status(403).json({ message: 'You do not have permission to modify this information.' });
   }
 
   const { isError, message } = checkIsValidUserBody(req);
@@ -81,16 +81,17 @@ router.put('/users/:id', authenticateToken, sanitizationUserBody, userValidation
   try {
     const hashedPassword = await hashPassword(password);
     const user = await User.findByIdAndUpdate(id, { name, username, email, hashedPassword }, { new: true });
+    
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
-    }
-    res.json({ message: `Updated '${user.username}' with success`});
+    } else
+      return res.json({ message: `Updated '${user.username}' with success`});
   } catch (err) {
     if(err.message.includes('duplicate key'))
-      res.status(409).json({ message: `Exist user with: ${err.keyValue.email || err.keyValue.username}`})
+      return res.status(409).json({ message: `Exist user with: ${err.keyValue.email || err.keyValue.username}`})
     else {
       const error = getErrorObject(err);
-      res.status(error.status).json(error);
+      return res.status(error.status).json(error);
     }
   }
 });
@@ -99,17 +100,17 @@ router.delete('/users/:id', authenticateToken, async (req: Request, res: Respons
   const id = req.params.id;
   
   if (id !== req.user?.id) {
-    return res.status(403).json({ message: 'Você não tem permissão para excluir estas informações.' });
+    return res.status(403).json({ message: 'You do not have permission to delete this information.' });
   }
   try {
     const user = await User.findByIdAndDelete(id);
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
-    }
-    res.status(200).json({ message: `Delete user '${user.username}' with success`});
+    } else
+      return res.status(200).json({ message: `Delete user '${user.username}' with success`});
   } catch (err) {
     const error = getErrorObject(err);
-    res.status(error.status).json(error);
+    return res.status(error.status).json(error);
   }
 });
 
