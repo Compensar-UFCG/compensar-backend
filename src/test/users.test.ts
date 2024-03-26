@@ -4,9 +4,9 @@ import usersMock from "./mocks/usersMock.json";
 import express from 'express';
 import UserModel from '../models/user.model';
 import bodyParser from 'body-parser';
-import { userErrorMessages } from '../utils/users.validation';
-
 import jwt from 'jsonwebtoken';
+
+import { userErrorMessages } from '../utils/users.validation';
 
 const app = express();
 
