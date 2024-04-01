@@ -10,7 +10,7 @@ router.post('/pdf', async (req: Request, res: Response) => {
 
   const doc = new PDFDocument();
 
-  const fontPath = path.join(__dirname, '../utils/fonts', 'OpenSans-Regular.ttf');
+  const fontPath = path.join(__dirname, '../../public/fonts', 'OpenSans-Regular.ttf');
   doc.font(fontPath);
 
   doc.fontSize(20).text(quiz.title, { align: 'center' });

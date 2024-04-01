@@ -20,7 +20,7 @@ const router = (0, express_1.Router)();
 router.post('/pdf', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const quiz = req.body;
     const doc = new pdfkit_1.default();
-    const fontPath = path_1.default.join(__dirname, '../utils/fonts', 'OpenSans-Regular.ttf');
+    const fontPath = path_1.default.join(__dirname, '../../public/fonts', 'OpenSans-Regular.ttf');
     doc.font(fontPath);
     doc.fontSize(20).text(quiz.title, { align: 'center' });
     doc.moveDown(1);
