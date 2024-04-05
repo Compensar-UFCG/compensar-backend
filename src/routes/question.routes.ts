@@ -56,22 +56,24 @@ router.post('/questions', sanitizationQuestionBody, questionValidationSchema, as
   const { isError, message } = checkIsValidQuestionBody(req);
 
   if(isError) return res.status(422).json({ message })
-
-  const { title, statement, image, font, year, type, alternatives, response } = req.body;
+  
+  const questionProcessing = questionDataProcessing({ ...req.body });
+  const competences = filterCompetences(req.body.competences);
 
   try {
-    const question = new Question({
-      title,
-      statement,
-      image,
-      font,
-      year,
-      type,
-      alternatives,
-      response
-    });
+    const question = new Question(questionProcessing);
 
     const newQuestion = await question.save();
+
+    await Promise.all(competences.map(async (competenceTitle: string) => {
+      const competence = await Competence.findOne({ title: competenceTitle });
+      if(competence)
+        await CompetenceQuestion.create({
+          competence: competence._id,
+          question: question._id
+        });
+    }));
+
     res.status(201).json({ message: `Created '${newQuestion.title}' with success`});
   } catch (err) {
     const error = getErrorObject(err);
