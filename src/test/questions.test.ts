@@ -6,10 +6,12 @@ import router, * as utils from '../routes/question.routes';
 
 import QuestionModel from '../models/question.model';
 import CompetenceQuestionModel from '../models/competenceQuestion.model';
+import CompetenceModel from '../models/competence.model';
 
 import questionsWithCompetencesMock from "./mocks/questionsWithCompetencesMock.json";
 import questionsWithoutCompetencesMock from "./mocks/questionsWithoutCompetencesMock.json";
 import competencesByQuestionIdUnhandledMock from "./mocks/competenceQuestionBefore/competencesByQuestionIdUnhandledMock.json";
+import competencesMock from "./mocks/competencesMock.json";
 
 import { questionErrorMessages } from '../utils/questions.validation';
 
@@ -21,7 +23,7 @@ app.use(router);
 
 jest.mock('../models/question.model');
 
-const payload = {...questionsWithoutCompetencesMock[0], password: "#Aa12345" }
+const payload = {...questionsWithoutCompetencesMock[0], password: "#Aa12345", competences: competencesMock }
 describe('Question Routes - API requests success and erros', () => {
   beforeEach(() => {
     QuestionModel.find = jest.fn().mockReturnValueOnce(questionsWithoutCompetencesMock);
@@ -34,6 +36,12 @@ describe('Question Routes - API requests success and erros', () => {
     Object.defineProperty(utils, 'getObject', {
       value: jest.fn().mockReturnValue(questionsWithoutCompetencesMock[0])
     })
+    CompetenceModel.findOne = jest.fn().mockReturnValueOnce(competencesMock[0]);
+    CompetenceQuestionModel.create = jest.fn().mockReturnValueOnce({
+      question: questionsWithoutCompetencesMock[0],
+      competence: competencesMock[0]
+    })
+    CompetenceQuestionModel.deleteMany = jest.fn().mockReturnValueOnce([]);
   });
 
   describe('GET /questions', () => {
