@@ -1,9 +1,12 @@
 import { Router, Request, Response } from 'express';
 import Question from '../models/question.model';
+import Competence from '../models/competence.model';
+
 import CompetenceQuestion from '../models/competenceQuestion.model';
 
 import { getErrorObject } from '../utils/error';
 import { checkIsValidQuestionBody, questionValidationSchema, sanitizationQuestionBody } from '../utils/questions.validation';
+import { filterCompetences, questionDataProcessing } from '../utils/questionsUtils';
 
 const router: Router = Router();
 
@@ -87,31 +90,27 @@ router.put('/questions/:id', sanitizationQuestionBody, questionValidationSchema,
   if(isError) return res.status(422).json({ message })
 
   const id = req.params.id;
-  const {
-    title,
-    statement,
-    image,
-    font,
-    year,
-    type,
-    alternatives,
-    response
-  } = req.body;
+
+  const questionProcessing = questionDataProcessing({ ...req.body });
+  const competences = filterCompetences(req.body.competences);
 
   try {
-    const question = await Question.findByIdAndUpdate(id, {
-      title,
-      statement,
-      image,
-      font,
-      year,
-      type,
-      alternatives,
-      response
-    }, { new: true });
+    const question = await Question.findByIdAndUpdate(id, questionProcessing, { new: true });
     if (!question) {
       return res.status(404).json({ message: 'Question not found' });
     }
+
+    await CompetenceQuestion.deleteMany({ question: id });
+
+    await Promise.all(competences.map(async (competenceTitle: string) => {
+      const competence = await Competence.findOne({ title: competenceTitle });
+      if(competence)
+        await CompetenceQuestion.create({
+          competence: competence._id,
+          question: question._id
+        });
+    }));
+
     res.json({ message: `Updated '${question.title}' with success`});
   } catch (err) {
     const error = getErrorObject(err);
