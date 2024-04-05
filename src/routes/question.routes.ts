@@ -121,10 +121,13 @@ router.put('/questions/:id', sanitizationQuestionBody, questionValidationSchema,
 router.delete('/questions/:id', async (req: Request, res: Response) => {
   const id = req.params.id;
   try {
+    await CompetenceQuestion.deleteMany({ question: id });
+
     const question = await Question.findByIdAndDelete(id);
     if (!question) {
       return res.status(404).json({ message: 'Question not found' });
     }
+
     res.status(200).json({ message: `Delete question '${question.title}' with success`});
   } catch (err) {
     const error = getErrorObject(err);
